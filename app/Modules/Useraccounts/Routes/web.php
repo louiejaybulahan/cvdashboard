@@ -1,0 +1,23 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| This file is where you may define all of the routes that are handled
+| by your module. Just tell Laravel the URIs it should respond
+| to using a Closure or controller method. Build something great!
+|
+*/
+
+Route::group(['prefix' => 'useraccounts'], function () {    
+    Route::get('/', function () {
+        // return view('useraccounts::index',[]);
+        
+        //dd('This is the Useraccounts module index page. Build something great!');
+        //Route::get('/','UseraccountsController@index')->name('index');    
+    });
+    
+    Route::get('/','UsersController@index')->name('index');    
+});

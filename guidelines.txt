@@ -1,0 +1,67 @@
+# https://laravel.com/docs/5.4/installation
+# https://laravel-news.com/your-first-laravel-application
+
+	composer create-project --prefer-dist laravel/laravel myframework
+
+# go inside to your folder and type this command in command prompt  # c:\htdocs\myframework
+	php artisan make:auth
+
+# create migration file 
+	php artisan make:migration create_user_info_table --create=user_info
+
+# run the migration
+	php artisan migrate
+
+# create model for the table 
+	php artisan make:model UserInfo
+
+# display all route list 
+	php artisan route:list
+
+# run php code in run command
+php artisan tinker
+	$userinfo = new App\UserInfo
+	$userinfo->username = 'admin';
+	$userinfo->password = Hash::make('password');
+	$userinfo->fname = 'admin';
+	$userinfo->lname = 'admin';
+	$userinfo->mname = 'admin';
+	$userinfo->status = 1;
+
+# clearing compiled and delet autoload classes from the vendor/composer
+composer dump-autoload
+ php artisan clear-compiled  
+ php artisan optimize
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+# installing extension forms and html on laravel //https://laravelcollective.com/docs/5.4/html
+composer require "laravelcollective/html":"^5.4.0"
+# Next, add your new provider to the providers array of config/app.php:
+'providers' => [
+    // ...
+    Collective\Html\HtmlServiceProvider::class,
+    // ...
+  ],
+# Finally, add two class aliases to the aliases array of config/app.php:  
+  'aliases' => [
+    // ...
+      'Form' => Collective\Html\FormFacade::class,
+      'Html' => Collective\Html\HtmlFacade::class,
+    // ...
+  ],
+
+# installing phpexcel // https://laravel-excel.maatwebsite.nl/docs/3.0/getting-started/installation
+composer require maatwebsite/excel
+----- add this on app/config/app.php
+'providers' => [
+    /*
+     * Package Service Providers...
+     */
+    Maatwebsite\Excel\ExcelServiceProvider::class,
+]
+'aliases' => [
+    ...
+    'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+]
+----- to publish in the config and run the vendor publish
+php artisan vendor:publish
