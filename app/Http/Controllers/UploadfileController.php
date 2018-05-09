@@ -11,15 +11,14 @@ use Illuminate\Http\Request;
 //use Illuminate\Support\Facades\Validator;
 //use Illuminate\Routing\UrlGenerator;
 //use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
 //use Illuminate\Support\Facades\Schema;
 //use Illuminate\Database\Schema\Blueprint;
 //use App\Config;
-
 //use PhpOffice\PhpSpreadsheet\Spreadsheet;
 //use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 //use PHPExcel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use PHPExcel_Reader_Excel2007;
 
 use Validator;
