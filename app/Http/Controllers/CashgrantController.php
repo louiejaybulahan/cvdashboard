@@ -26,7 +26,8 @@ class CashgrantController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {             
+    public function index(Request $request) {  
+        // the quick brown fox jump over the lazy dog           
         $currentYear = \App\Config::getValue('PERIOD_CURRENT');
         $province = \App\Province::orderBy('name')->get();
         $standard = \App\StandardRemarks::orderBy('remarks')->get();    
