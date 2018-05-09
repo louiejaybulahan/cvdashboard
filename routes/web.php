@@ -11,21 +11,12 @@
 |
 */
 
-
 Route::get('/','SiteController@index');
 
 Auth::routes();
 
 Route::get('/home',function(){ return Redirect::to('site'); });
 
-/*
-Route::get('/', function () {   
-    return view('welcome');
-});
-Route::get('/submit', function () {
-    return view('submit');
-});
-*/
 Route::get('/logout',function(){ return Redirect::to('login'); });
 Route::get('/loguser','Auth\LoginController@loguser')->name('loguser');     
 
@@ -56,7 +47,10 @@ Route::group(['prefix' => 'listeducation', 'as' => 'listeducation.'], function (
     Route::post('filter','ListEducationController@filter')->name('filter');    
     Route::post('search','ListEducationController@search')->name('search');    
     Route::get('rebuildfilter','ListEducationController@rebuildfilter')->name('rebuildfilter');
-    Route::get('summary','ListEducationController@showSummary')->name('summary');              
+    Route::get('summary','ListEducationController@showSummary')->name('summary');  
+    Route::get('getprovince','ListEducationController@getProvince')->name('getprovince');
+    Route::get('getmunicipality','ListEducationController@getMunicipality')->name('getmunicipality');
+    Route::get('getbrgy','ListEducationController@getBrgy')->name('getbrgy');
 });
 
 Route::group(['prefix' => 'listfds', 'as' => 'listfds.'], function () {

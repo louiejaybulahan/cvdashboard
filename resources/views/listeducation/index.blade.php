@@ -32,7 +32,62 @@
 <script type="text/javascript">
 jQuery(document).ready(function () {
     jQuery('.chosen,#municipal').chosen({width: "95%"});
-   
+    jQuery('#region').change(function(){
+        var tmp = new Array();
+        var select = '#province';
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
+        jQuery.ajax({
+            type: "POST", url:'{{ route('listeducation.getprovince') }}', data: dataString, dataType: 'json', cache: false,
+            error: function (request, status, error) { jsMessage('Error Request'); },
+            success: function (data) {
+                tmp = $(select).val();
+                 $(select + ' option').remove();
+                if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                    jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.prov_id + '|' + val.mun_id + '|'+ val.name+'">' + val.name + '</option>'); });
+                    if (tmp != null){ $(select).val(tmp); }
+                }
+                $(select).trigger('chosen:updated');
+                $(select).trigger('change');
+            }
+        });
+    });
+    jQuery('#province').change(function(){
+        var tmp = new Array();
+        var select = '#municipality';
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
+        jQuery.ajax({
+            type: "POST", url:'{{ route('listeducation.getmunicipality') }}', data: dataString, dataType: 'json', cache: false,
+            error: function (request, status, error) { jsMessage('Error Request'); },
+            success: function (data) {
+                tmp = $(select).val();
+                 $(select + ' option').remove();
+                if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                    jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.prov_id + '|' + val.mun_id + '|'+ val.name+'">' + val.name + '</option>'); });
+                    if (tmp != null){ $(select).val(tmp); }
+                }
+                $(select).trigger('chosen:updated');
+                $(select).trigger('change');
+            }
+        });
+    });    
+    jQuery('#municipality').change(function(){
+        var tmp = new Array();
+        var select = '#brgy';
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
+        jQuery.ajax({
+            type: "POST", url:'{{ route('listeducation.getbrgy') }}', data: dataString, dataType: 'json', cache: false,
+            error: function (request, status, error) { jsMessage('Error Request'); },
+            success: function (data) {
+                tmp = $(select).val();
+                $(select + ' option').remove();
+                if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                    jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.mun_id + '|' + val.brgy_id + '|'+val.name+'">' + val.name + '</option>'); });
+                    if (tmp != null){ $(select).val(tmp); }
+                }
+                $(select).trigger('chosen:updated');
+            }
+        });
+    });    
     jQuery('#year').change(function(){
         var tmpSet = tmpBank = tmpPeriod = tmpModepayment = new Array();
         if (jQuery(this).val() != null){
@@ -110,40 +165,6 @@ jQuery(document).ready(function () {
         }
     }); 
 
-/*
-             {title:'REGION', field:'region', frozen:true},
-            {title:'PROVINCE', field:'province', frozen:true},
-            {title:'CITY', field:'city', frozen:true},
-            {title:'BRGY', field:'brgy', frozen:true},
-            {title:'<center><input type="checkbox" id="checkAll" name="checkAll" style="padding:0px; margin:0px;"></center>', field:'householdid', align:"center", formatter: checkbox, headerSort:false, frozen:true},            
-            {title:'CATEGORY', field:'category'},                                    
-            {title:'SET', field:'set'},
-            {title:'SET GROUP', field:'setgroup', width: 70},
-            {title:'ELIGIBILITY', field:'eligibility', width: 70},
-            {title:'NOT ATTENDED DOMINANT SCHOOL', field:'not_attend_dominant', width: 70},
-            {title:'ATTEND DOMINANT SCHOOL', field:'attend_dominant'},            
-            {title:'ATTENDING DELETED DOMINANT SCHOOL', field:'attend_del_dominant', width: 70},
-            {title:'OUTSIDE', field:'outside'},
-            {title:'MONITORED UNDER DOMINANT SCHOOL', field:'monitored_dominant', width: 70},                        
-            {title:'ENCODED AND APPROVED', field:'endcoded_approved', width: 70},            
-            {title:'SUBMITTED WITH DEWORMING CONDUCTED', field:'submitted_deworming', width: 70},            
-            {title:'NOT ENCODED OR APPROVED', field:'not_encoded_approved', width: 70},
-            {title:'ENCODED UNDER FORCE MAJEURE', field:'encoded_under_forcem', width: 80},
-            {title:'NON-COMPLIANT', field:'mop'},
-            {title:'COMPLIANT', field:'compliant'},            
-            {title:'REMARKS 1', field:'remarks_1'},
-            {title:'REMARKS 2', field:'remarks_2'},
-            {title:'REMARKS 3', field:'remarks_3'},
-            {title:'REMARKS 4', field:'remarks_4'},            
-            {title:'YEAR', field:'year'},
-            {title:'PERIOD', field:'period', width: 60},
-            {title:'MONTH', field:'month'},            
-            {title:'CLIENT STATUS', field:'client_status'},
-            {title:'SEX', field:'sex'},
-            {title:'GRADE GROUP', field:'grade_group'},
-            {title:'IP', field:'ip'},                     
-            {title:'#', field:'counter', sorter:'number'},  
- */
     var checkbox = function(cell, formatterParams){ return '<input type="checkbox" id="optHousehold" name="optHousehold" class="optHousehold" value="'+cell.getValue()+'" style="padding:0px; margin:0px;">'; }    
     jQuery("#resultTable").tabulator({
         height:"800px",

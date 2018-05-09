@@ -214,16 +214,35 @@ class ListEducationController extends Controller {
             'registration' => $registration,
         ]);                  
     }
-    public function city(Request $request){  
+    public function getProvince(Request $request){
         $list = null;
         if($request->id!='null'){
-            $muni = new \App\CityMuni();        
-            $l = $muni->whereIn('prov_id',$request->id)->orderBy('name')->get();        
+            $id = [];
+            foreach($request->id AS $r):
+                $tmp = explode('|',$r);
+                $id[] = $tmp[1];
+            endforeach;     
+            $model = new \App\Models\LibProvince();        
+            $l = $model->whereIn('REGION_ID',$id)->orderBy('PROVINCE_NAME')->get();        
             $list = $l->toArray();
         }
         return response()->json(['list' => $list]);
     }
-    public function brgy(Request $request){  
+    public function getCity(Request $request){  
+        $list = null;
+        if($request->id!='null'){
+            $id = [];
+            foreach($request->id AS $r):
+                $tmp = explode('|',$r);
+                $id[] = $tmp[1];
+            endforeach;   
+            $model = new \App\Models\LibCities();        
+            $l = $model->whereIn('PROVINCE_ID',$id)->orderBy('CITY_NAME')->get();        
+            $list = $l->toArray();
+        }
+        return response()->json(['list' => $list]);
+    }
+    public function getBrgy(Request $request){  
         $list = null;
         if($request->id!='null'){
             $brgyId = [];
