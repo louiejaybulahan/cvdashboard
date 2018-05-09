@@ -36,7 +36,6 @@ class ListEducationController extends Controller {
         $province = [];
         $muni = [];
         $brgy = [];
-        $psgc = [];        
         $hh_status = [];
         $ip = [];
         $grade = [];
@@ -88,12 +87,7 @@ class ListEducationController extends Controller {
             $tmp = fgets($f3);
             $dom_sch_name = array_merge($dom_sch_name,json_decode($tmp));
             fclose($f3);
-            
-            $f4 = fopen($pathFilters.'education_'.$r->year.'_psgc.json','r');
-            $tmp = fgets($f4);
-            $psgc = array_merge($psgc,json_decode($tmp));
-            fclose($f4);
-            
+       
             $f5 = fopen($pathFilters.'education_'.$r->year.'_shoolbrgy.json','r');
             $tmp = fgets($f5);
             $school_brgy = array_merge($school_brgy,json_decode($tmp));
@@ -110,7 +104,7 @@ class ListEducationController extends Controller {
         $_province = array_unique($province);
         $_muni = array_unique($muni);
         $_brgy = array_unique($brgy);
-        $_psgc = array_unique($psgc);
+        // $_psgc = array_unique($psgc);
         $_hh_status = array_unique($hh_status);
         $_ip = array_unique($ip);
         $_grade = array_unique($grade);
@@ -132,8 +126,7 @@ class ListEducationController extends Controller {
         sort($_region);
         sort($_province);
         sort($_muni);
-        sort($_brgy);        
-        sort($_psgc);
+        sort($_brgy);                
         sort($_hh_status);
         sort($_ip);
         sort($_grade);          
@@ -155,8 +148,7 @@ class ListEducationController extends Controller {
             '_region' => $_region,
             '_province' => $_province,
             '_muni' => $_muni,
-            '_brgy' => $_brgy,
-            '_psgc' => $_psgc,
+            '_brgy' => $_brgy,            
             '_hh_status' => $_hh_status,
             '_ip' => $_ip,
             '_grade' => $_grade,
@@ -288,13 +280,6 @@ class ListEducationController extends Controller {
             $brgy[] = $r->{$column};
         }
                         
-        $column = 'psgc';
-        $psgc = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $psgc[] = $r->{$column};
-        }
-        
         $column = 'hh_status';
         $hh_status = [];
         $result = DB::table($table.$year)->select($column)->groupBy($column)->get();        
@@ -406,11 +391,7 @@ class ListEducationController extends Controller {
         $f = fopen($pathFilters.'education_'.$year.'_brgy.json','w');
         fwrite($f,json_encode($brgy));
         fclose($f);
-               
-        $f = fopen($pathFilters.'education_'.$year.'_psgc.json','w');
-        fwrite($f,json_encode($psgc));
-        fclose($f);
-        
+                       
         $f = fopen($pathFilters.'education_'.$year.'_shoolname.json','w');
         fwrite($f,json_encode($school_name));
         fclose($f);
@@ -476,7 +457,6 @@ class ListEducationController extends Controller {
             'province' => $request->province,
             'muni' => $request->muni,
             'brgy' => $request->brgy,           
-            'psgc' => $request->psgc,
             'hh_status' => $request->hh_status,
             'hh_id' => $request->hh_id,
             'entry_id' => $request->entry_id,            
@@ -519,8 +499,7 @@ class ListEducationController extends Controller {
                     'region' => $r->region,
                     'province' => $r->province,
                     'muni' => $r->muni,
-                    'brgy' => $r->brgy,
-                    'psgc' => $r->psgc,
+                    'brgy' => $r->brgy,                    
                     'hh_status' => $r->hh_status,
                     'hh_id' => $r->hh_id,
                     'entry_id' => $r->entry_id,

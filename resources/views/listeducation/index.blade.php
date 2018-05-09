@@ -213,8 +213,7 @@ function jsFilters(page){
         'region' : jQuery('#region').val(),
         'muni' : jQuery('#muni').val(),
         'city' : jQuery('#city').val(),       
-        'brgy' : jQuery('#brgy').val(),            
-        'psgc' : jQuery('#psgc').val(),            
+        'brgy' : jQuery('#brgy').val(),                    
         'hh_status' : jQuery('#hh_status').val(),
         'hh_id' : jQuery('#hh_id').val(),
         'lastname' : jQuery('#lastname').val(),
@@ -264,16 +263,6 @@ function jsSearchData(page){
             $('#resultTable').tabulator("setData",data.tableData);
         }
     }).done(function(){ jQuery('#checkAll').prop('checked',false); jQuery('#loading').fadeOut(); });
-    
-    /*
-    var ajaxConfig = {
-        type:'POST', //set request type to Position     
-        //contentType: 'application/json; charset=utf-8', //set specific content type       
-        ajaxResponse:function(url, params, response){ console.log('hello world');  },
-        //success: function(data){ console.log(data); }
-    };
-    $('#resultTable').tabulator("setData",'{{ route('listeducation.search') }}', dataString, ajaxConfig);
-    */
     return false;
 }
 function jsShowSummary(){
@@ -341,16 +330,7 @@ function jsShowSummary(){
                     @endforeach
                 </select>
                 <small class="desc" style="margin:0px;">Select as many barangay</small>
-            </p>
-            <p>
-                <strong>PSGC:</strong><br>
-                <select id="psgc" name="psgc" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_psgc AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
-                </select>
-                <small class="desc" style="margin:0px;">select as many psgc</small>
-            </p>   
+            </p>            
             <p>
                 <strong>Household Status:</strong><br>
                 <select id="hh_status" name="hh_status" class="chosen" multiple="multiple" data-placeholder="-">                    
@@ -360,7 +340,15 @@ function jsShowSummary(){
                 </select>
                 <small class="desc" style="margin:0px;">Select as many household status</small>
             </p>  
-           
+            <p>
+                <strong>Grade:</strong><br>
+                <select id="grade" name="grade" class="chosen" multiple="multiple" data-placeholder="-">                    
+                    @foreach($_grade AS $r)
+                    <option value="{{ $r }}">{{ $r }}</option>
+                    @endforeach
+                </select>
+                <small class="desc" style="margin:0px;">Select as many grade</small>
+            </p>            
         </div>            
         <div class="one_fourth">             
             <p>
@@ -492,16 +480,7 @@ function jsShowSummary(){
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>             
         </div>   
-        <div class="one_fourth last">            
-            <p>
-                <strong>Grade:</strong><br>
-                <select id="grade" name="grade" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_grade AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
-                </select>
-                <small class="desc" style="margin:0px;">Select as many grade</small>
-            </p>   
+        <div class="one_fourth last">                          
             <p>
                 <strong>Entry Id:</strong><br>
                 <input style="padding:5px 5px;" type="text" name="entry_id" id="entry_id" class="longinput">
