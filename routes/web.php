@@ -48,9 +48,9 @@ Route::group(['prefix' => 'listeducation', 'as' => 'listeducation.'], function (
     Route::post('search','ListEducationController@search')->name('search');    
     Route::get('rebuildfilter','ListEducationController@rebuildfilter')->name('rebuildfilter');
     Route::get('summary','ListEducationController@showSummary')->name('summary');  
-    Route::get('getprovince','ListEducationController@getProvince')->name('getprovince');
-    Route::get('getmunicipality','ListEducationController@getMunicipality')->name('getmunicipality');
-    Route::get('getbrgy','ListEducationController@getBrgy')->name('getbrgy');
+    Route::post('getprovince','ListEducationController@getProvince')->name('getprovince');
+    Route::post('getmunicipality','ListEducationController@getMunicipality')->name('getmunicipality');
+    Route::post('getbrgy','ListEducationController@getBrgy')->name('getbrgy');
 });
 
 Route::group(['prefix' => 'listfds', 'as' => 'listfds.'], function () {

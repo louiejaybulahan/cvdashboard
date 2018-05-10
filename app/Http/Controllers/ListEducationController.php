@@ -32,10 +32,10 @@ class ListEducationController extends Controller {
         $currentYear = date('Y'); 
         
         $period = [];
-        $region = [];
-        $province = [];
-        $muni = [];
-        $brgy = [];
+        // $region = [];
+        // $province = [];
+        // $muni = [];
+        // $brgy = [];
         $hh_status = [];
         $ip = [];
         $grade = [];
@@ -57,9 +57,9 @@ class ListEducationController extends Controller {
         foreach($model AS $r){
             $year[] = $r->year;
             $period = array_merge($period,json_decode($r->period));
-            $region = array_merge($region,json_decode($r->region));
-            $province = array_merge($province,json_decode($r->province));
-            $muni = array_merge($muni,json_decode($r->muni));            
+            // $region = array_merge($region,json_decode($r->region));
+            // $province = array_merge($province,json_decode($r->province));
+            // $muni = array_merge($muni,json_decode($r->muni));            
             $hh_status = array_merge($hh_status,json_decode($r->hh_status));
             $ip = array_merge($ip,json_decode($r->ip));
             $grade = array_merge($grade,json_decode($r->grade));            
@@ -73,10 +73,10 @@ class ListEducationController extends Controller {
             $month = array_merge($month,json_decode($r->month));
                                     
             
-            $f1 = fopen($pathFilters.'education_'.$r->year.'_brgy.json','r');
-            $tmp = fgets($f1);
-            $brgy = array_merge($brgy,json_decode($tmp));
-            fclose($f1);
+            // $f1 = fopen($pathFilters.'education_'.$r->year.'_brgy.json','r');
+            // $tmp = fgets($f1);
+            // $brgy = array_merge($brgy,json_decode($tmp));
+            // fclose($f1);
             
             $f2 = fopen($pathFilters.'education_'.$r->year.'_domschoolbrgy.json','r');
             $tmp = fgets($f2);
@@ -100,10 +100,10 @@ class ListEducationController extends Controller {
         }              
                         
         $_period = array_unique($period);
-        $_region = array_unique($region);
-        $_province = array_unique($province);
-        $_muni = array_unique($muni);
-        $_brgy = array_unique($brgy);
+        // $_region = array_unique($region);
+        // $_province = array_unique($province);
+        // $_muni = array_unique($muni);
+        // $_brgy = array_unique($brgy);
         // $_psgc = array_unique($psgc);
         $_hh_status = array_unique($hh_status);
         $_ip = array_unique($ip);
@@ -123,10 +123,10 @@ class ListEducationController extends Controller {
                  
         sort($year);
         sort($_period);
-        sort($_region);
-        sort($_province);
-        sort($_muni);
-        sort($_brgy);                
+        // sort($_region);
+        // sort($_province);
+        // sort($_muni);
+        // sort($_brgy);                
         sort($_hh_status);
         sort($_ip);
         sort($_grade);          
@@ -142,13 +142,14 @@ class ListEducationController extends Controller {
         sort($_dom_sch_brgy);  
         sort($_remarks);  
         sort($_month);  
-                
+
+        $_region = \App\Models\LibRegions::all();        
         return view('listeducation.index',[            
             '_period' => $_period,
             '_region' => $_region,
-            '_province' => $_province,
-            '_muni' => $_muni,
-            '_brgy' => $_brgy,            
+            // '_province' => $_province,
+            // '_muni' => $_muni,
+            // '_brgy' => $_brgy,            
             '_hh_status' => $_hh_status,
             '_ip' => $_ip,
             '_grade' => $_grade,
@@ -216,42 +217,27 @@ class ListEducationController extends Controller {
     }
     public function getProvince(Request $request){
         $list = null;
-        if($request->id!='null'){
-            $id = [];
-            foreach($request->id AS $r):
-                $tmp = explode('|',$r);
-                $id[] = $tmp[1];
-            endforeach;     
-            $model = new \App\Models\LibProvince();        
-            $l = $model->whereIn('REGION_ID',$id)->orderBy('PROVINCE_NAME')->get();        
+        if($request->id!='null'){            
+            $model = new \App\Models\LibProvinces();        
+            $l = $model->whereIn('REGION_ID',$request->id)->orderBy('PROVINCE_NAME')->get();        
             $list = $l->toArray();
         }
         return response()->json(['list' => $list]);
     }
-    public function getCity(Request $request){  
+    public function getMunicipality(Request $request){  
         $list = null;
-        if($request->id!='null'){
-            $id = [];
-            foreach($request->id AS $r):
-                $tmp = explode('|',$r);
-                $id[] = $tmp[1];
-            endforeach;   
+        if($request->id!='null'){                       
             $model = new \App\Models\LibCities();        
-            $l = $model->whereIn('PROVINCE_ID',$id)->orderBy('CITY_NAME')->get();        
+            $l = $model->whereIn('PROVINCE_ID',$request->id)->orderBy('CITY_NAME')->get();        
             $list = $l->toArray();
         }
         return response()->json(['list' => $list]);
     }
     public function getBrgy(Request $request){  
         $list = null;
-        if($request->id!='null'){
-            $brgyId = [];
-            foreach($request->id AS $r):
-                $tmp = explode('|',$r);
-                $brgyId[] = $tmp[1];
-            endforeach;               
-            $model = new \App\Barangay();        
-            $l = $model->whereIn('mun_id',$brgyId)->orderBy('name')->get();        
+        if($request->id!='null'){            
+            $model = new \App\Models\LibBrgy();        
+            $l = $model->whereIn('CITY_ID',$request->id)->orderBy('BRGY_NAME')->get();        
             $list = $l->toArray();
         }
         return response()->json(['list' => $list]);
