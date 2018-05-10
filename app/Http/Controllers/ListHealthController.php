@@ -31,11 +31,11 @@ class ListHealthController extends Controller {
     public function index(Request $request) {                     
         $currentYear = date('Y');         
         $period = [];
-        $region = [];
-        $province = [];
-        $muni = [];
-        $brgy = [];
-        $psgc = [];        
+        // $region = [];
+        // $province = [];
+        // $muni = [];
+        // $brgy = [];
+        // $psgc = [];        
         $hh_status = [];
         $ip = [];
         $sex = [];
@@ -59,9 +59,9 @@ class ListHealthController extends Controller {
         foreach($model AS $r){
             $year[] = $r->year;
             $period = array_merge($period,json_decode($r->period));
-            $region = array_merge($region,json_decode($r->region));
-            $province = array_merge($province,json_decode($r->province));
-            $muni = array_merge($muni,json_decode($r->muni));
+            // $region = array_merge($region,json_decode($r->region));
+            // $province = array_merge($province,json_decode($r->province));
+            // $muni = array_merge($muni,json_decode($r->muni));
             //$brgy = array_merge($brgy,json_decode($r->brgy));
             //$psgc = array_merge($psgc,json_decode($r->psgc));
             $hh_status = array_merge($hh_status,json_decode($r->hh_status));
@@ -83,15 +83,15 @@ class ListHealthController extends Controller {
             $month = array_merge($month,json_decode($r->month));
             
 
-            $f = fopen($pathFilters.'health_'.$r->year.'_brgy.json','r');
-            $tmp = fgets($f);
-            $brgy = array_merge($brgy,json_decode($tmp));
-            fclose($f);
+            // $f = fopen($pathFilters.'health_'.$r->year.'_brgy.json','r');
+            // $tmp = fgets($f);
+            // $brgy = array_merge($brgy,json_decode($tmp));
+            // fclose($f);
             
-            $f = fopen($pathFilters.'health_'.$r->year.'_psgc.json','r');
-            $tmp = fgets($f);
-            $psgc = array_merge($psgc,json_decode($tmp));
-            fclose($f); 
+            // $f = fopen($pathFilters.'health_'.$r->year.'_psgc.json','r');
+            // $tmp = fgets($f);
+            // $psgc = array_merge($psgc,json_decode($tmp));
+            // fclose($f); 
 
             $f = fopen($pathFilters.'health_'.$r->year.'_hcname.json','r');
             $tmp = fgets($f);
@@ -115,11 +115,11 @@ class ListHealthController extends Controller {
         }         
         
         $_period = array_unique($period);
-        $_region = array_unique($region);
-        $_province = array_unique($province);
-        $_muni = array_unique($muni);
-        $_brgy = array_unique($brgy);
-        $_psgc = array_unique($psgc);
+        // $_region = array_unique($region);
+        // $_province = array_unique($province);
+        // $_muni = array_unique($muni);
+        // $_brgy = array_unique($brgy);
+        // $_psgc = array_unique($psgc);
         $_hh_status = array_unique($hh_status);
         $_ip = array_unique($ip);
         $_sex = array_unique($sex);
@@ -140,11 +140,11 @@ class ListHealthController extends Controller {
                  
         sort($year);
         sort($_period);
-        sort($_region);
-        sort($_province);
-        sort($_muni);
-        sort($_brgy);        
-        sort($_psgc);
+        // sort($_region);
+        // sort($_province);
+        // sort($_muni);
+        // sort($_brgy);        
+        // sort($_psgc);
         sort($_hh_status);
         sort($_ip);
         sort($_sex);
@@ -162,14 +162,15 @@ class ListHealthController extends Controller {
         sort($_dom_hc_brgy);  
         sort($_remarks);  
         sort($_month);  
-                
+
+        $_region = \App\Models\LibRegions::all();         
         return view('listhealth.index',[            
             '_period' => $_period,
             '_region' => $_region,
-            '_province' => $_province,
-            '_muni' => $_muni,
-            '_brgy' => $_brgy,
-            '_psgc' => $_psgc,
+            // '_province' => $_province,
+            // '_muni' => $_muni,
+            // '_brgy' => $_brgy,
+            // '_psgc' => $_psgc,
             '_hh_status' => $_hh_status,
             '_ip' => $_ip,
             '_sex' => $_sex,
@@ -237,25 +238,29 @@ class ListHealthController extends Controller {
             'registration' => $registration,
         ]);                  
     }
-    public function city(Request $request){  
+    public function getProvince(Request $request){
         $list = null;
-        if($request->id!='null'){
-            $muni = new \App\CityMuni();        
-            $l = $muni->whereIn('prov_id',$request->id)->orderBy('name')->get();        
+        if($request->id!='null'){            
+            $model = new \App\Models\LibProvinces();        
+            $l = $model->whereIn('REGION_ID',$request->id)->orderBy('PROVINCE_NAME')->get();        
             $list = $l->toArray();
         }
         return response()->json(['list' => $list]);
     }
-    public function brgy(Request $request){  
+    public function getMunicipality(Request $request){  
         $list = null;
-        if($request->id!='null'){
-            $brgyId = [];
-            foreach($request->id AS $r):
-                $tmp = explode('|',$r);
-                $brgyId[] = $tmp[1];
-            endforeach;               
-            $model = new \App\Barangay();        
-            $l = $model->whereIn('mun_id',$brgyId)->orderBy('name')->get();        
+        if($request->id!='null'){                       
+            $model = new \App\Models\LibCities();        
+            $l = $model->whereIn('PROVINCE_ID',$request->id)->orderBy('CITY_NAME')->get();        
+            $list = $l->toArray();
+        }
+        return response()->json(['list' => $list]);
+    }
+    public function getBrgy(Request $request){  
+        $list = null;
+        if($request->id!='null'){            
+            $model = new \App\Models\LibBrgy();        
+            $l = $model->whereIn('CITY_ID',$request->id)->orderBy('BRGY_NAME')->get();        
             $list = $l->toArray();
         }
         return response()->json(['list' => $list]);
@@ -275,40 +280,40 @@ class ListHealthController extends Controller {
             $period[] = $r->{$column};
         }
 
-        $column = 'region';
-        $region = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $region[] = $r->{$column};
-        }
+        // $column = 'region';
+        // $region = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $region[] = $r->{$column};
+        // }
         
-        $column = 'province';
-        $province = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $province[] = $r->{$column};
-        }
+        // $column = 'province';
+        // $province = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $province[] = $r->{$column};
+        // }
         
-        $column = 'muni';
-        $muni = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $muni[] = $r->{$column};
-        }
+        // $column = 'muni';
+        // $muni = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $muni[] = $r->{$column};
+        // }
         
-        $column = 'brgy';
-        $brgy = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $brgy[] = $r->{$column};
-        }
+        // $column = 'brgy';
+        // $brgy = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $brgy[] = $r->{$column};
+        // }
                 
-        $column = 'psgc';
-        $psgc = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $psgc[] = $r->{$column};
-        }
+        // $column = 'psgc';
+        // $psgc = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $psgc[] = $r->{$column};
+        // }
         
         $column = 'hh_status';
         $hh_status = [];
@@ -429,14 +434,14 @@ class ListHealthController extends Controller {
             $month[] = $r->{$column};
         }  
 
-        $pathFilters = \Config::get('constants.path_filters_data');
-        $f = fopen($pathFilters.'health_'.$year.'_brgy.json','w');
-        fwrite($f,json_encode($brgy));
-        fclose($f);
+        // $pathFilters = \Config::get('constants.path_filters_data');
+        // $f = fopen($pathFilters.'health_'.$year.'_brgy.json','w');
+        // fwrite($f,json_encode($brgy));
+        // fclose($f);
                
-        $f = fopen($pathFilters.'health_'.$year.'_psgc.json','w');
-        fwrite($f,json_encode($psgc));
-        fclose($f);
+        // $f = fopen($pathFilters.'health_'.$year.'_psgc.json','w');
+        // fwrite($f,json_encode($psgc));
+        // fclose($f);
 
         $f = fopen($pathFilters.'health_'.$year.'_hcname.json','w');
         fwrite($f,json_encode($hc_name));
@@ -458,9 +463,9 @@ class ListHealthController extends Controller {
             'id' => null,            
             'year' => $year,            
             'period' => json_encode($period),            
-            'region' => json_encode($region),
-            'province' => json_encode($province),
-            'muni' => json_encode($muni),                                  
+            'region' => '[]', // json_encode($region),
+            'province' => '[]', // json_encode($province),
+            'muni' => '[]', // json_encode($muni),                                  
             'hh_status' => json_encode($hh_status),
             'ip' => json_encode($ip),
             'sex' => json_encode($sex),            
@@ -501,11 +506,15 @@ class ListHealthController extends Controller {
         $counter = $offset + 1;        
         $model = new TblNonCompliantHealth();        
         $model->search = [  
-            'region' => $request->region,
-            'province' => $request->province,
-            'muni' => $request->muni,
-            'brgy' => $request->brgy,           
-            'psgc' => $request->psgc,
+            // 'region' => $request->region,
+            // 'province' => $request->province,
+            // 'muni' => $request->muni,
+            // 'brgy' => $request->brgy,           
+            // 'psgc' => $request->psgc,
+            'REGION_ID' => $request->region,
+            'PROVINCE_ID' => $request->province,
+            'CITY_ID' => $request->muni,
+            'BRGY_ID' => $request->brgy, 
             'hh_status' => $request->hh_status,
             'hh_id' => $request->hh_id,
             'entry_id' => $request->entry_id,            
@@ -536,8 +545,7 @@ class ListHealthController extends Controller {
             'limit' => $request->limit,
             'select' => '',
             'count' => false,
-        ];            
-        // echo $model->getQuery();
+        ];                    
         $data = $model->getData();        
         $request->session()->put('listnoncomplianteducation', $model->search);        
         if(!empty($data)){            
@@ -545,10 +553,10 @@ class ListHealthController extends Controller {
             foreach($data AS $r){
                 $list[] = [                    
                     'counter' => $counter,
-                    'region' => $r->region,
-                    'province' => $r->province,
-                    'muni' => $r->muni,
-                    'brgy' => $r->brgy,
+                    'region' => $r->REGION_NAME,
+                    'province' => $r->PROVINCE_NAME,
+                    'muni' => $r->CITY_NAME,
+                    'brgy' => $r->BRGY_NAME,       
                     'psgc' => $r->psgc,
                     'hh_status' => $r->hh_status,
                     'hh_id' => $r->hh_id,

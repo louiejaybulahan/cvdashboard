@@ -231,33 +231,33 @@ class ListEducationController extends Controller {
             $period[] = $r->{$column};
         }
 
-        $column = 'region';
-        $region = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $region[] = $r->{$column};
-        }
+        // $column = 'region';
+        // $region = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $region[] = $r->{$column};
+        // }
         
-        $column = 'province';
-        $province = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $province[] = $r->{$column};
-        }
+        // $column = 'province';
+        // $province = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $province[] = $r->{$column};
+        // }
         
-        $column = 'muni';
-        $muni = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $muni[] = $r->{$column};
-        }
+        // $column = 'muni';
+        // $muni = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $muni[] = $r->{$column};
+        // }
         
-        $column = 'brgy';
-        $brgy = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $brgy[] = $r->{$column};
-        }
+        // $column = 'brgy';
+        // $brgy = [];
+        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+        // foreach($result AS $r){
+        //     $brgy[] = $r->{$column};
+        // }
                         
         $column = 'hh_status';
         $hh_status = [];
@@ -366,10 +366,10 @@ class ListEducationController extends Controller {
             $month[] = $r->{$column};
         }  
         
-        $pathFilters = \Config::get('constants.path_filters_data');
-        $f = fopen($pathFilters.'education_'.$year.'_brgy.json','w');
-        fwrite($f,json_encode($brgy));
-        fclose($f);
+        // $pathFilters = \Config::get('constants.path_filters_data');
+        // $f = fopen($pathFilters.'education_'.$year.'_brgy.json','w');
+        // fwrite($f,json_encode($brgy));
+        // fclose($f);
                        
         $f = fopen($pathFilters.'education_'.$year.'_shoolname.json','w');
         fwrite($f,json_encode($school_name));
@@ -391,9 +391,9 @@ class ListEducationController extends Controller {
             'id' => null,            
             'year' => $year,            
             'period' => json_encode($period),            
-            'region' => json_encode($region),
-            'province' => json_encode($province),
-            'muni' => json_encode($muni),            
+            'region' => '[]', // json_encode($region),
+            'province' => '[]', // json_encode($province),
+            'muni' => '[]', // json_encode($muni),            
             'hh_status' => json_encode($hh_status),
             'ip' => json_encode($ip),
             'grade' => json_encode($grade),            
@@ -481,7 +481,8 @@ class ListEducationController extends Controller {
                     'province' => $r->PROVINCE_NAME,
                     'muni' => $r->CITY_NAME,
                     'brgy' => $r->BRGY_NAME,                    
-                    'hh_status' => $r->hh_status,
+                    'psgc' => $r->psgc,
+                    'hh_status' => $r->hh_status,                    
                     'hh_id' => $r->hh_id,
                     'entry_id' => $r->entry_id,
                     'lastname' => $r->lastname,

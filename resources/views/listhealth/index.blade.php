@@ -32,6 +32,62 @@
 <script type="text/javascript">
 jQuery(document).ready(function () {
     jQuery('.chosen,#municipal').chosen({width: "95%"});
+    jQuery('#region').change(function(){
+        var tmp = new Array();
+        var select = '#province';
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};        
+            jQuery.ajax({
+                type: "POST", url:'{{ route('listeducation.getprovince') }}', data: dataString, dataType: 'json', cache: false,
+                error: function (request, status, error) { jsMessage('Error Request'); },
+                success: function (data) {
+                    tmp = $(select).val();
+                    $(select + ' option').remove();
+                    if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                        jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.PROVINCE_ID +'">' + val.PROVINCE_NAME + '</option>'); });
+                        if (tmp != null){ $(select).val(tmp); }
+                    }
+                    $(select).trigger('chosen:updated');
+                    $(select).trigger('change');
+                }
+            });                
+    });
+    jQuery('#province').change(function(){
+        var tmp = new Array();
+        var select = '#municipality';        
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};         
+            jQuery.ajax({
+                type: "POST", url:'{{ route('listeducation.getmunicipality') }}', data: dataString, dataType: 'json', cache: false,
+                error: function (request, status, error) { jsMessage('Error Request'); },
+                success: function (data) {
+                    tmp = $(select).val();
+                    $(select + ' option').remove();
+                    if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                        jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.CITY_ID +'">' + val.CITY_NAME + '</option>'); });
+                        if (tmp != null){ $(select).val(tmp); }
+                    }                
+                    $(select).trigger('chosen:updated');
+                    $(select).trigger('change');
+                }
+            });
+    });    
+    jQuery('#municipality').change(function(){
+        var tmp = new Array();
+        var select = '#brgy';
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
+            jQuery.ajax({
+                type: "POST", url:'{{ route('listeducation.getbrgy') }}', data: dataString, dataType: 'json', cache: false,
+                error: function (request, status, error) { jsMessage('Error Request'); },
+                success: function (data) {
+                    tmp = $(select).val();
+                    $(select + ' option').remove();
+                    if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                        jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.BRGY_ID +'">' + val.BRGY_NAME + '</option>'); });
+                        if (tmp != null){ $(select).val(tmp); }
+                    }
+                    $(select).trigger('chosen:updated');
+                }
+            });
+    });        
     var checkbox = function(cell, formatterParams){ return '<input type="checkbox" id="optHousehold" name="optHousehold" class="optHousehold" value="'+cell.getValue()+'" style="padding:0px; margin:0px;">'; }    
     jQuery("#resultTable").tabulator({
         height:"800px",
@@ -203,7 +259,7 @@ function jsShowSummary(){
                 <strong>Region:</strong><br>
                 <select id="region" name="region" class="chosen" multiple="multiple" data-placeholder="-">                    
                     @foreach($_region AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
+                        <option value="{{ $r->REGION_ID }}">{{ $r->REGION_NAME }}</option>
                     @endforeach
                 </select>
                 <small class="desc" style="margin:0px;">select as many region</small>
@@ -211,39 +267,25 @@ function jsShowSummary(){
             <p>
                 <strong>Province:</strong><br>
                 <select id="province" name="province" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_province AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <option value=""></option>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many province</small>
             </p>
             <p>
                 <strong>Municipality:</strong><br>
                 <select id="municipality" name="municipality" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_muni AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <option value=""></option>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many municipality</small>
             </p>
             <p>
                 <strong>Barangay:</strong><br>
                 <select id="brgy" name="brgy" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_brgy AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <option value=""></option>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many barangay</small>
             </p>
-            <p>
-                <strong>PSGC:</strong><br>
-                <select id="psgc" name="psgc" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_psgc AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
-                </select>
-                <small class="desc" style="margin:0px;">select as many psgc</small>
-            </p>   
+            
             <p>
                 <strong>Household Status:</strong><br>
                 <select id="hh_status" name="hh_status" class="chosen" multiple="multiple" data-placeholder="-">                    
@@ -327,16 +369,7 @@ function jsShowSummary(){
                     @endforeach
                 </select>
                 <small class="desc" style="margin:0px;">Select as many period</small>
-            </p>      
-            <p>
-                <strong>IP:</strong><br>
-                <select id="ip" name="ip" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_ip AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
-                </select>
-                <small class="desc" style="margin:0px;">Select as many ip</small>
-            </p>              
+            </p>                               
         </div>               
         <div class="one_fourth">
             <p>
@@ -404,7 +437,15 @@ function jsShowSummary(){
             </p>            
         </div>   
         <div class="one_fourth last">            
-
+            <p>
+                <strong>IP:</strong><br>
+                <select id="ip" name="ip" class="chosen" multiple="multiple" data-placeholder="-">                    
+                    @foreach($_ip AS $r)
+                    <option value="{{ $r }}">{{ $r }}</option>
+                    @endforeach
+                </select>
+                <small class="desc" style="margin:0px;">Select as many ip</small>
+            </p> 
             <p>
                 <strong>Entry ID:</strong><br>
                 <input style="padding:5px 5px;" type="text" name="entry_id" id="entry_id" class="longinput">

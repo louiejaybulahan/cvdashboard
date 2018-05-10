@@ -20,9 +20,10 @@ class TblNonCompliantHealth extends Model
         'dom_hc_province','dom_hc_muni','dom_hc_brgy','remarks','month',
         'year','period','brgy_id'];  
 
-    protected $skipColumn = ['id','hh_id','entry_id','lastname','firstname','middlename','ext','birthday','brgy_id','hc_id','dom_hc_id','year'];    
+    protected $skipColumn = ['id','region', 'province', 'muni', 'brgy','psgc','hh_id','entry_id','lastname','firstname','middlename','ext','birthday','brgy_id','hc_id','dom_hc_id','year','REGION_ID','PROVINCE_ID','CITY_ID','BRGY_ID'];    
     protected $exactQuery = ['id','hh_id','entry_id','ext','birthday','brgy_id','hc_id','dom_hc_id','ext'];
     protected $likeQuery = ['lastname','firstname','middlename','birthday'];
+    protected $otherTablColumn = ['REGION_ID' => 'lib_regions.REGION_ID','PROVINCE_ID' => 'lib_provinces.PROVINCES_ID','CITY_ID' => 'lib_cities.CITY_ID','BRGY_ID' => 'lib_brgy.BRGY_ID'];
     
     protected $allowedFilter = [];
     protected $filters;
@@ -73,18 +74,18 @@ class TblNonCompliantHealth extends Model
     }
     protected function buildQuery(){  
         $this->query = '';  
-        $merge = array_merge($this->skipColumn,['brgy','psgc','hc_name','hc_brgy','dom_hc_name','dom_hc_brgy']);
+        $merge = array_merge($this->skipColumn,['hc_name','hc_brgy','dom_hc_name','dom_hc_brgy']);
         $this->allowedFilter = array_diff($this->column, $merge);
         $tmpFilter = \App\Models\FiltersHealth::all($this->allowedFilter);
         $this->filters = $tmpFilter->toArray(); // Session::get($this->table);
-        $this->currentYear = date('Y'); // stored this in global config
+        $this->currentYear = date('Y'); 
     	if(!isset($this->search['year']) OR $this->search['year']=='null'):
     		$this->search['year'] = [$this->currentYear];             
     	endif;	
-        if (!isset($this->search['limit'])){  //($this->search['limit']=='' AND $this->search['limit']==null):           
+        if (!isset($this->search['limit'])){  
             $this->search['limit'] = \Config::get('constants.page_limit');
         }
-        if (!isset($this->search['page'])){  // ($this->search['page']=='' AND $this->search['page']==null):
+        if (!isset($this->search['page'])){
             $this->search['page'] = 1;
         }
         if(!isset($this->search['order'])){
@@ -98,17 +99,22 @@ class TblNonCompliantHealth extends Model
     	foreach($this->search['year'] AS $y){
     		if($hasUnion==true) $this->query .= ' UNION ALL ';
             $hasWhere = $this->hasWhere($y);
-            $select = '';
+            $select = '';            
             if($this->search['count']==false){
                 if(is_array($this->search['select'])){                    
+                    $this->search['select'] = array_merge($this->search['select'],['lib_brgy.BRGY_NAME','lib_cities.CITY_NAME','lib_provinces.PROVINCE_NAME','lib_regions.REGION_NAME']);
                     $select = implode('\',\'',$this->search['select']);
-                }else{ $select = $this->table.$y.'.*'; }
+                }else{ $select = $this->table.$y.'.*, lib_brgy.BRGY_NAME,lib_cities.CITY_NAME,lib_provinces.PROVINCE_NAME,lib_regions.REGION_NAME'; }
             }else{                 
                 if(is_array($this->search['select'])){
                     $select = implode('\',\'',$this->search['select']);
                 }else{ $select = 'COUNT(*) AS total'; }
             }
-    		$this->query .= 'SELECT \''.$y.'\' As y,'.$select.' FROM '.$this->table.$y.(isset($hasWhere)?' WHERE '.$hasWhere:'');
+            $leftJoin = ' LEFT JOIN lib_brgy ON lib_brgy.BRGY_ID='.$this->table.$y.'.brgy_id
+                          LEFT JOIN lib_cities ON lib_cities.CITY_ID=lib_brgy.CITY_ID 
+                          LEFT JOIN lib_provinces ON lib_provinces.PROVINCE_ID=lib_cities.PROVINCE_ID
+                          LEFT JOIN lib_regions ON lib_regions.REGION_ID=lib_provinces.REGION_ID ';
+    		$this->query .= 'SELECT \''.$y.'\' As y,'.$select.' FROM '.$this->table.$y.$leftJoin.(isset($hasWhere)?' WHERE '.$hasWhere:'');
     		$hasUnion = true;
     	}
         $order = '';
@@ -121,147 +127,15 @@ class TblNonCompliantHealth extends Model
         return $this->query;      
     }
     protected function hasWhere($year){    	
-        $where = null;
-        /*
-        $toSearch = 'household';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-          $where .= ' `'.$this->table.$year.'`.`hh_id` = \''.$this->search[$toSearch].'\'';
-        }
-        $toSearch = 'lastname';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            $where .= (($where!=null)?' AND ':''). ' `'.$this->table.$year.'`.`lname` LIKE \''.$this->search[$toSearch].'%\'';
-        }
-        $toSearch = 'firstname';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`fname` LIKE \''.$this->search[$toSearch].'%\'';
-        }
-        $toSearch = 'middlename';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`mname` LIKE \''.$this->search[$toSearch].'%\'';
-        }
-        $toSearch = 'period_cover';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`period_cover` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`period_cover` = \''.current($this->search[$toSearch]).'\'';
-        }
-        $toSearch = 'modepayment';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`mop` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`mop` = \''.current($this->search[$toSearch]).'\'';
-        }        
-        $toSearch = 'regspec';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`regular_special_etc` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`regular_special_etc` = \''.current($this->search[$toSearch]).'\'';
-        }        
-        $toSearch = 'bank';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`lbp_branch` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`lbp_branch` = \''.current($this->search[$toSearch]).'\'';
-        }
-        $toSearch = 'set';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`set_no` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`set_no` = \''.current($this->search[$toSearch]).'\'';
-        }
-        $toSearch = 'program';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`type_of_program` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`type_of_program` = \''.current($this->search[$toSearch]).'\'';
-        }
-        $toSearch = 'payroll';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`type_payrol` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`type_payrol` = \''.current($this->search[$toSearch]).'\'';
-        }
-
-        $toSearch = 'remarks';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`remarks` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`remarks` = \''.current($this->search[$toSearch]).'\'';
-        }
-        $toSearch = 'standard';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`standard_remarks` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`standard_remarks` = \''.current($this->search[$toSearch]).'\'';
-        }
-        $toSearch = 'registration';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`type_registration` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`type_registration` = \''.current($this->search[$toSearch]).'\'';
-        }
-        $toSearch = 'paid';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1) $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`paid` IN (\''.implode('\',\'',$this->search[$toSearch]).'\')';
-            else $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`paid` = \''.current($this->search[$toSearch]).'\'';
-        }
-        $toSearch = 'province';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){            
-            if(count($this->search[$toSearch])>1){ 
-                $tmp = null;
-                $arr = [];
-                foreach($this->search[$toSearch] AS $r){
-                    $tmp = explode('|',$r);
-                    $arr[] = end($tmp);
-                }
-                $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`province` IN (\''.implode('\',\'',$arr).'\')';
-            }
-            else{                 
-                $tmp = explode('|',current($this->search[$toSearch]));
-                $item = end($tmp);                
-                $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`province` = \''.$item.'\'';
-            }
-        }
-        $toSearch = 'municipal';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1){
-                $tmp = null;
-                $arr = [];
-                foreach($this->search[$toSearch] AS $r){
-                    $tmp = explode('|',$r);
-                    $arr[] = end($tmp);
-                }
-                $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`city_mun_fields` IN (\''.implode('\',\'',$arr).'\')';
-            } 
-            else{
-                $tmp = explode('|',current($this->search[$toSearch]));
-                $item = end($tmp);                
-                $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`city_mun_fields` = \''.$item.'\'';
-            }    
-        }        
-        $toSearch = 'brgy';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            if(count($this->search[$toSearch])>1){
-                $tmp = null;
-                $arr = [];
-                foreach($this->search[$toSearch] AS $r){
-                    $tmp = explode('|',$r);
-                    $arr[] = end($tmp);
-                }
-                $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`brgy` IN (\''.implode('\',\'',$arr).'\')';
-            }    
-            else{
-                $tmp = explode('|',current($this->search[$toSearch]));
-                $item = end($tmp);  
-                $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`brgy` = \''.$item.'\'';
-            }    
-        }         
-        */
-        /*
-        $toSearch = 'datefrom';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            $where .= ' `'.$this->table.$year.'`.`mname` LIKE \''.$this->search[$toSearch].'%\'';
-        }
-        $toSearch = 'dateto';
-        if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
-            $where .= ' `'.$this->table.$year.'`.`mname` LIKE \''.$this->search[$toSearch].'%\'';
-        }        
-        */                
+        $where = null;                        
         $skipColumn = array_diff($this->column, $this->skipColumn);
         foreach($this->column AS $toSearch){     
             if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
                 if(!in_array($toSearch, $this->skipColumn)){                
                     $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` REGEXP \''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\'';                
+                }
+                else if(isset($this->otherTablColumn[$toSearch])){
+                    $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$this->otherTablColumn[$toSearch].'` REGEXP \''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\'';
                 }
                 else if(in_array($toSearch,$this->exactQuery)){                                        
                     $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` = \''.$this->search[$toSearch].'\'';
