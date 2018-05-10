@@ -421,7 +421,6 @@ class ListEducationController extends Controller {
         $counter = 1;
         $list = [];            
         $data = [];
-
         if($request->limit=='' AND $request->limit==null):
             $request->limit = \Config::get('constants.page_limit');
         endif;
@@ -432,10 +431,14 @@ class ListEducationController extends Controller {
         $counter = $offset + 1;        
         $model = new TblNonCompliantEducation();        
         $model->search = [  
-            'region' => $request->region,
-            'province' => $request->province,
-            'muni' => $request->muni,
-            'brgy' => $request->brgy,           
+            // 'region' => $request->region,
+            // 'province' => $request->province,
+            // 'muni' => $request->muni,
+            // 'brgy' => $request->brgy, 
+            'REGION_ID' => $request->region,
+            'PROVINCE_ID' => $request->province,
+            'CITY_ID' => $request->muni,
+            'BRGY_ID' => $request->brgy, 
             'hh_status' => $request->hh_status,
             'hh_id' => $request->hh_id,
             'entry_id' => $request->entry_id,            
@@ -466,8 +469,7 @@ class ListEducationController extends Controller {
             'limit' => $request->limit,
             'select' => '',
             'count' => false,
-        ];            
-        // echo $model->getQuery();
+        ];                    
         $data = $model->getData();        
         $request->session()->put('listnoncomplianteducation', $model->search);        
         if(!empty($data)){            
@@ -475,10 +477,10 @@ class ListEducationController extends Controller {
             foreach($data AS $r){
                 $list[] = [                    
                     'counter' => $counter,
-                    'region' => $r->region,
-                    'province' => $r->province,
-                    'muni' => $r->muni,
-                    'brgy' => $r->brgy,                    
+                    'region' => $r->REGION_NAME,
+                    'province' => $r->PROVINCE_NAME,
+                    'muni' => $r->CITY_NAME,
+                    'brgy' => $r->BRGY_NAME,                    
                     'hh_status' => $r->hh_status,
                     'hh_id' => $r->hh_id,
                     'entry_id' => $r->entry_id,
@@ -514,7 +516,7 @@ class ListEducationController extends Controller {
         $cntlr = $request->session()->get('controller.listnoncomplianteducation',null); 
         if($request->page==1){
             $foundSession = true;
-            $model->search['count'] = true;                        
+            $model->search['count'] = true;            
             $cntlr = $model->getData();                               
             $request->session()->put('controller.listnoncomplianteducation',$cntlr);            
         }    

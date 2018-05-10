@@ -36,7 +36,6 @@ jQuery(document).ready(function () {
         var tmp = new Array();
         var select = '#province';
         var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};        
-        if(jQuery(this).val()!=null){        
             jQuery.ajax({
                 type: "POST", url:'{{ route('listeducation.getprovince') }}', data: dataString, dataType: 'json', cache: false,
                 error: function (request, status, error) { jsMessage('Error Request'); },
@@ -50,18 +49,12 @@ jQuery(document).ready(function () {
                     $(select).trigger('chosen:updated');
                     $(select).trigger('change');
                 }
-            });        
-        }else{
-            $('#province' + ' option').remove().trigger('chosend:updated'); 
-            $('#municipality' + ' option').remove().trigger('chosend:updated'); 
-            $('#brgy' + ' option').remove().trigger('chosend:updated'); 
-        }
+            });                
     });
     jQuery('#province').change(function(){
         var tmp = new Array();
         var select = '#municipality';        
-        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
-        if(jQuery(this).val()!=null){        
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};         
             jQuery.ajax({
                 type: "POST", url:'{{ route('listeducation.getmunicipality') }}', data: dataString, dataType: 'json', cache: false,
                 error: function (request, status, error) { jsMessage('Error Request'); },
@@ -76,16 +69,11 @@ jQuery(document).ready(function () {
                     $(select).trigger('change');
                 }
             });
-        }else{
-            $('#municipality' + ' option').remove().trigger('chosend:updated'); 
-            $('#brgy' + ' option').remove().trigger('chosend:updated'); 
-        }
     });    
     jQuery('#municipality').change(function(){
         var tmp = new Array();
         var select = '#brgy';
         var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
-        if(jQuery(this).val()!=null){   
             jQuery.ajax({
                 type: "POST", url:'{{ route('listeducation.getbrgy') }}', data: dataString, dataType: 'json', cache: false,
                 error: function (request, status, error) { jsMessage('Error Request'); },
@@ -99,9 +87,6 @@ jQuery(document).ready(function () {
                     $(select).trigger('chosen:updated');
                 }
             });
-        }else{            
-            $('#brgy' + ' option').remove().trigger('chosend:updated'); 
-        }
     });    
     jQuery('#year').change(function(){
         var tmpSet = tmpBank = tmpPeriod = tmpModepayment = new Array();
