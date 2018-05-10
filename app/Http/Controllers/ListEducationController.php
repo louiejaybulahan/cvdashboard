@@ -29,13 +29,8 @@ class ListEducationController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {                     
-        $currentYear = date('Y'); 
-        
-        $period = [];
-        // $region = [];
-        // $province = [];
-        // $muni = [];
-        // $brgy = [];
+        $currentYear = date('Y');         
+        $period = [];        
         $hh_status = [];
         $ip = [];
         $grade = [];
@@ -56,10 +51,7 @@ class ListEducationController extends Controller {
         $model = \App\Models\FiltersEducation::all();
         foreach($model AS $r){
             $year[] = $r->year;
-            $period = array_merge($period,json_decode($r->period));
-            // $region = array_merge($region,json_decode($r->region));
-            // $province = array_merge($province,json_decode($r->province));
-            // $muni = array_merge($muni,json_decode($r->muni));            
+            $period = array_merge($period,json_decode($r->period));            
             $hh_status = array_merge($hh_status,json_decode($r->hh_status));
             $ip = array_merge($ip,json_decode($r->ip));
             $grade = array_merge($grade,json_decode($r->grade));            
@@ -71,13 +63,7 @@ class ListEducationController extends Controller {
             $dom_sch_muni = array_merge($dom_sch_muni,json_decode($r->dom_sch_muni));            
             $remarks = array_merge($remarks,json_decode($r->remarks));
             $month = array_merge($month,json_decode($r->month));
-                                    
-            
-            // $f1 = fopen($pathFilters.'education_'.$r->year.'_brgy.json','r');
-            // $tmp = fgets($f1);
-            // $brgy = array_merge($brgy,json_decode($tmp));
-            // fclose($f1);
-            
+                                                
             $f2 = fopen($pathFilters.'education_'.$r->year.'_domschoolbrgy.json','r');
             $tmp = fgets($f2);
             $dom_sch_brgy = array_merge($dom_sch_brgy,json_decode($tmp));
@@ -99,12 +85,7 @@ class ListEducationController extends Controller {
             fclose($f6);
         }              
                         
-        $_period = array_unique($period);
-        // $_region = array_unique($region);
-        // $_province = array_unique($province);
-        // $_muni = array_unique($muni);
-        // $_brgy = array_unique($brgy);
-        // $_psgc = array_unique($psgc);
+        $_period = array_unique($period);        
         $_hh_status = array_unique($hh_status);
         $_ip = array_unique($ip);
         $_grade = array_unique($grade);
@@ -122,11 +103,7 @@ class ListEducationController extends Controller {
         $_month = array_unique($month);        
                  
         sort($year);
-        sort($_period);
-        // sort($_region);
-        // sort($_province);
-        // sort($_muni);
-        // sort($_brgy);                
+        sort($_period);                  
         sort($_hh_status);
         sort($_ip);
         sort($_grade);          
@@ -146,10 +123,7 @@ class ListEducationController extends Controller {
         $_region = \App\Models\LibRegions::all();        
         return view('listeducation.index',[            
             '_period' => $_period,
-            '_region' => $_region,
-            // '_province' => $_province,
-            // '_muni' => $_muni,
-            // '_brgy' => $_brgy,            
+            '_region' => $_region,                  
             '_hh_status' => $_hh_status,
             '_ip' => $_ip,
             '_grade' => $_grade,

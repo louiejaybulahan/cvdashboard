@@ -36,20 +36,26 @@ jQuery(document).ready(function () {
         var tmp = new Array();
         var select = '#province';
         var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};        
-        jQuery.ajax({
-            type: "POST", url:'{{ route('listeducation.getprovince') }}', data: dataString, dataType: 'json', cache: false,
-            error: function (request, status, error) { jsMessage('Error Request'); },
-            success: function (data) {
-                tmp = $(select).val();
-                 $(select + ' option').remove();
-                if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
-                    jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.PROVINCE_ID +'">' + val.PROVINCE_NAME + '</option>'); });
-                    if (tmp != null){ $(select).val(tmp); }
+        if(jQuery(this).val()!=null){        
+            jQuery.ajax({
+                type: "POST", url:'{{ route('listeducation.getprovince') }}', data: dataString, dataType: 'json', cache: false,
+                error: function (request, status, error) { jsMessage('Error Request'); },
+                success: function (data) {
+                    tmp = $(select).val();
+                    $(select + ' option').remove();
+                    if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                        jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.PROVINCE_ID +'">' + val.PROVINCE_NAME + '</option>'); });
+                        if (tmp != null){ $(select).val(tmp); }
+                    }
+                    $(select).trigger('chosen:updated');
+                    $(select).trigger('change');
                 }
-                $(select).trigger('chosen:updated');
-                $(select).trigger('change');
-            }
-        });
+            });        
+        }else{
+            $('#province' + ' option').remove().trigger('chosend:updated'); 
+            $('#municipality' + ' option').remove().trigger('chosend:updated'); 
+            $('#brgy' + ' option').remove().trigger('chosend:updated'); 
+        }
     });
     jQuery('#province').change(function(){
         var tmp = new Array();
@@ -70,6 +76,9 @@ jQuery(document).ready(function () {
                     $(select).trigger('change');
                 }
             });
+        }else{
+            $('#municipality' + ' option').remove().trigger('chosend:updated'); 
+            $('#brgy' + ' option').remove().trigger('chosend:updated'); 
         }
     });    
     jQuery('#municipality').change(function(){
@@ -90,7 +99,9 @@ jQuery(document).ready(function () {
                     $(select).trigger('chosen:updated');
                 }
             });
-        }    
+        }else{            
+            $('#brgy' + ' option').remove().trigger('chosend:updated'); 
+        }
     });    
     jQuery('#year').change(function(){
         var tmpSet = tmpBank = tmpPeriod = tmpModepayment = new Array();
