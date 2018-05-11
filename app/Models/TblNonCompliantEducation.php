@@ -18,7 +18,7 @@ class TblNonCompliantEducation extends Model
         'grade','school_id','school_name','school_region','school_province',
         'school_muni','school_brgy','dom_sch_id','dom_sch_name','dom_sch_region',
         'dom_sch_province','dom_sch_muni','dom_sch_brgy','remarks','month',
-        'year','period','brgy_id'];          
+        'year','period','brgy_id','REGION_ID','PROVINCE_ID','CITY_ID','BRGY_ID'];          
     protected $skipColumn = ['id','region', 'province', 'muni', 'brgy','psgc','hh_id','entry_id','lastname','firstname','middlename','ext','bday','brgy_id','school_id','dom_sch_id','year','REGION_ID','PROVINCE_ID','CITY_ID','BRGY_ID'];    
     protected $exactQuery = ['id','hh_id','entry_id','ext','bday','brgy_id','school_id','dom_sch_id','ext'];
     protected $likeQuery = ['lastname','firstname','middlename','bday'];
@@ -133,7 +133,7 @@ class TblNonCompliantEducation extends Model
                     $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` REGEXP \''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\'';
                 }
                 else if(isset($this->otherTablColumn[$toSearch])){
-                    $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$this->otherTablColumn[$toSearch].'` REGEXP \''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\'';
+                    $where .= (($where!=null)?' AND ':'') . ' '.$this->otherTablColumn[$toSearch].' IN (\''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\')';
                 }
                 else if(in_array($toSearch,$this->exactQuery)){                                        
                     $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` = \''.$this->search[$toSearch].'\'';

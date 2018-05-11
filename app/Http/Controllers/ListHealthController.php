@@ -30,12 +30,7 @@ class ListHealthController extends Controller {
      */
     public function index(Request $request) {                     
         $currentYear = date('Y');         
-        $period = [];
-        // $region = [];
-        // $province = [];
-        // $muni = [];
-        // $brgy = [];
-        // $psgc = [];        
+        $period = [];             
         $hh_status = [];
         $ip = [];
         $sex = [];
@@ -58,40 +53,21 @@ class ListHealthController extends Controller {
         $model = \App\Models\FiltersHealth::all();
         foreach($model AS $r){
             $year[] = $r->year;
-            $period = array_merge($period,json_decode($r->period));
-            // $region = array_merge($region,json_decode($r->region));
-            // $province = array_merge($province,json_decode($r->province));
-            // $muni = array_merge($muni,json_decode($r->muni));
-            //$brgy = array_merge($brgy,json_decode($r->brgy));
-            //$psgc = array_merge($psgc,json_decode($r->psgc));
+            $period = array_merge($period,json_decode($r->period));          
             $hh_status = array_merge($hh_status,json_decode($r->hh_status));
             $ip = array_merge($ip,json_decode($r->ip));
             $sex = array_merge($sex,json_decode($r->sex));
             $pregnant = array_merge($pregnant,json_decode($r->pregnant));
-            $child = array_merge($child,json_decode($r->child));
-            //$hc_name = array_merge($hc_name,json_decode($r->hc_name));
+            $child = array_merge($child,json_decode($r->child));            
             $hc_region = array_merge($hc_region,json_decode($r->hc_region));
             $hc_province = array_merge($hc_province,json_decode($r->hc_province));
-            $hc_muni = array_merge($hc_muni,json_decode($r->hc_muni));
-            //$hc_brgy = array_merge($hc_brgy,json_decode($r->hc_brgy));
-            //$dom_hc_name = array_merge($dom_hc_name,json_decode($r->dom_hc_name));
+            $hc_muni = array_merge($hc_muni,json_decode($r->hc_muni));            
             $dom_hc_region = array_merge($dom_hc_region,json_decode($r->dom_hc_region));
             $dom_hc_province = array_merge($dom_hc_province,json_decode($r->dom_hc_province));
-            $dom_hc_muni = array_merge($dom_hc_muni,json_decode($r->dom_hc_muni));
-            //$dom_hc_brgy = array_merge($dom_hc_brgy,json_decode($r->dom_hc_brgy));
+            $dom_hc_muni = array_merge($dom_hc_muni,json_decode($r->dom_hc_muni));            
             $remarks = array_merge($remarks,json_decode($r->remarks));
             $month = array_merge($month,json_decode($r->month));
             
-
-            // $f = fopen($pathFilters.'health_'.$r->year.'_brgy.json','r');
-            // $tmp = fgets($f);
-            // $brgy = array_merge($brgy,json_decode($tmp));
-            // fclose($f);
-            
-            // $f = fopen($pathFilters.'health_'.$r->year.'_psgc.json','r');
-            // $tmp = fgets($f);
-            // $psgc = array_merge($psgc,json_decode($tmp));
-            // fclose($f); 
 
             $f = fopen($pathFilters.'health_'.$r->year.'_hcname.json','r');
             $tmp = fgets($f);
@@ -114,12 +90,7 @@ class ListHealthController extends Controller {
             fclose($f);               
         }         
         
-        $_period = array_unique($period);
-        // $_region = array_unique($region);
-        // $_province = array_unique($province);
-        // $_muni = array_unique($muni);
-        // $_brgy = array_unique($brgy);
-        // $_psgc = array_unique($psgc);
+        $_period = array_unique($period);        
         $_hh_status = array_unique($hh_status);
         $_ip = array_unique($ip);
         $_sex = array_unique($sex);
@@ -139,12 +110,7 @@ class ListHealthController extends Controller {
         $_month = array_unique($month);        
                  
         sort($year);
-        sort($_period);
-        // sort($_region);
-        // sort($_province);
-        // sort($_muni);
-        // sort($_brgy);        
-        // sort($_psgc);
+        sort($_period);        
         sort($_hh_status);
         sort($_ip);
         sort($_sex);
@@ -166,11 +132,7 @@ class ListHealthController extends Controller {
         $_region = \App\Models\LibRegions::all();         
         return view('listhealth.index',[            
             '_period' => $_period,
-            '_region' => $_region,
-            // '_province' => $_province,
-            // '_muni' => $_muni,
-            // '_brgy' => $_brgy,
-            // '_psgc' => $_psgc,
+            '_region' => $_region,            
             '_hh_status' => $_hh_status,
             '_ip' => $_ip,
             '_sex' => $_sex,
@@ -280,41 +242,6 @@ class ListHealthController extends Controller {
             $period[] = $r->{$column};
         }
 
-        // $column = 'region';
-        // $region = [];
-        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        // foreach($result AS $r){
-        //     $region[] = $r->{$column};
-        // }
-        
-        // $column = 'province';
-        // $province = [];
-        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        // foreach($result AS $r){
-        //     $province[] = $r->{$column};
-        // }
-        
-        // $column = 'muni';
-        // $muni = [];
-        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        // foreach($result AS $r){
-        //     $muni[] = $r->{$column};
-        // }
-        
-        // $column = 'brgy';
-        // $brgy = [];
-        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        // foreach($result AS $r){
-        //     $brgy[] = $r->{$column};
-        // }
-                
-        // $column = 'psgc';
-        // $psgc = [];
-        // $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        // foreach($result AS $r){
-        //     $psgc[] = $r->{$column};
-        // }
-        
         $column = 'hh_status';
         $hh_status = [];
         $result = DB::table($table.$year)->select($column)->groupBy($column)->get();        
@@ -433,16 +360,7 @@ class ListHealthController extends Controller {
         foreach($result AS $r){
             $month[] = $r->{$column};
         }  
-
-        // $pathFilters = \Config::get('constants.path_filters_data');
-        // $f = fopen($pathFilters.'health_'.$year.'_brgy.json','w');
-        // fwrite($f,json_encode($brgy));
-        // fclose($f);
-               
-        // $f = fopen($pathFilters.'health_'.$year.'_psgc.json','w');
-        // fwrite($f,json_encode($psgc));
-        // fclose($f);
-
+       
         $f = fopen($pathFilters.'health_'.$year.'_hcname.json','w');
         fwrite($f,json_encode($hc_name));
         fclose($f);
@@ -505,12 +423,7 @@ class ListHealthController extends Controller {
         $offset = ($request->page - 1) * $request->limit;   
         $counter = $offset + 1;        
         $model = new TblNonCompliantHealth();        
-        $model->search = [  
-            // 'region' => $request->region,
-            // 'province' => $request->province,
-            // 'muni' => $request->muni,
-            // 'brgy' => $request->brgy,           
-            // 'psgc' => $request->psgc,
+        $model->search = [              
             'REGION_ID' => $request->region,
             'PROVINCE_ID' => $request->province,
             'CITY_ID' => $request->muni,
@@ -545,7 +458,7 @@ class ListHealthController extends Controller {
             'limit' => $request->limit,
             'select' => '',
             'count' => false,
-        ];                    
+        ];                           
         $data = $model->getData();        
         $request->session()->put('listnoncomplianteducation', $model->search);        
         if(!empty($data)){            
@@ -617,9 +530,7 @@ class ListHealthController extends Controller {
         $search['select'] = ['COUNT(*) AS total'];
         $grants = new CashGrant();        
         $grants->search = $search;   
-        $data = $grants->getData();     
-        // echo $grants->getQuery();
-        // \App\Helpers\AppTools::printArray($search);             
+        $data = $grants->getData();                        
         $totalRecords = 0;        
         if(!empty($data)){
             foreach($data AS $r){

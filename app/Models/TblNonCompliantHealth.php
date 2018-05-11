@@ -18,7 +18,7 @@ class TblNonCompliantHealth extends Model
         'pregnant','child','hc_id','hc_name','hc_region','hc_province',
         'hc_muni','hc_brgy','dom_hc_id','dom_hc_name','dom_hc_region',
         'dom_hc_province','dom_hc_muni','dom_hc_brgy','remarks','month',
-        'year','period','brgy_id'];  
+        'year','period','brgy_id','REGION_ID','PROVINCE_ID','CITY_ID','BRGY_ID'];  
 
     protected $skipColumn = ['id','region', 'province', 'muni', 'brgy','psgc','hh_id','entry_id','lastname','firstname','middlename','ext','birthday','brgy_id','hc_id','dom_hc_id','year','REGION_ID','PROVINCE_ID','CITY_ID','BRGY_ID'];    
     protected $exactQuery = ['id','hh_id','entry_id','ext','birthday','brgy_id','hc_id','dom_hc_id','ext'];
@@ -127,15 +127,15 @@ class TblNonCompliantHealth extends Model
         return $this->query;      
     }
     protected function hasWhere($year){    	
-        $where = null;                        
+        $where = null;    
         $skipColumn = array_diff($this->column, $this->skipColumn);
-        foreach($this->column AS $toSearch){     
-            if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
+        foreach($this->column AS $toSearch){                 
+            if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){                
                 if(!in_array($toSearch, $this->skipColumn)){                
                     $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` REGEXP \''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\'';                
                 }
                 else if(isset($this->otherTablColumn[$toSearch])){
-                    $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$this->otherTablColumn[$toSearch].'` REGEXP \''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\'';
+                    $where .= (($where!=null)?' AND ':'') . ' '.$this->otherTablColumn[$toSearch].' IN (\''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\')';
                 }
                 else if(in_array($toSearch,$this->exactQuery)){                                        
                     $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` = \''.$this->search[$toSearch].'\'';

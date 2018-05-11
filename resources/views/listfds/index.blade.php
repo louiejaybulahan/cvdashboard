@@ -31,6 +31,62 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function () {
+    jQuery('#region').change(function(){
+        var tmp = new Array();
+        var select = '#province';
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};        
+            jQuery.ajax({
+                type: "POST", url:'{{ route('listeducation.getprovince') }}', data: dataString, dataType: 'json', cache: false,
+                error: function (request, status, error) { jsMessage('Error Request'); },
+                success: function (data) {
+                    tmp = $(select).val();
+                    $(select + ' option').remove();
+                    if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                        jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.PROVINCE_ID +'">' + val.PROVINCE_NAME + '</option>'); });
+                        if (tmp != null){ $(select).val(tmp); }
+                    }
+                    $(select).trigger('chosen:updated');
+                    $(select).trigger('change');
+                }
+            });                
+    });
+    jQuery('#province').change(function(){
+        var tmp = new Array();
+        var select = '#municipality';        
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};         
+            jQuery.ajax({
+                type: "POST", url:'{{ route('listeducation.getmunicipality') }}', data: dataString, dataType: 'json', cache: false,
+                error: function (request, status, error) { jsMessage('Error Request'); },
+                success: function (data) {
+                    tmp = $(select).val();
+                    $(select + ' option').remove();
+                    if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                        jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.CITY_ID +'">' + val.CITY_NAME + '</option>'); });
+                        if (tmp != null){ $(select).val(tmp); }
+                    }                
+                    $(select).trigger('chosen:updated');
+                    $(select).trigger('change');
+                }
+            });
+    });    
+    jQuery('#municipality').change(function(){
+        var tmp = new Array();
+        var select = '#brgy';
+        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
+            jQuery.ajax({
+                type: "POST", url:'{{ route('listeducation.getbrgy') }}', data: dataString, dataType: 'json', cache: false,
+                error: function (request, status, error) { jsMessage('Error Request'); },
+                success: function (data) {
+                    tmp = $(select).val();
+                    $(select + ' option').remove();
+                    if (data.list != '' && jQuery.isEmptyObject(data.list) == false) {
+                        jQuery.each(data.list, function(key, val){ $(select).append('<option value="' + val.BRGY_ID +'">' + val.BRGY_NAME + '</option>'); });
+                        if (tmp != null){ $(select).val(tmp); }
+                    }
+                    $(select).trigger('chosen:updated');
+                }
+            });
+    });   
     jQuery('.chosen,#municipal').chosen({width: "95%"});
     var checkbox = function(cell, formatterParams){ return '<input type="checkbox" id="optHousehold" name="optHousehold" class="optHousehold" value="'+cell.getValue()+'" style="padding:0px; margin:0px;">'; }    
     jQuery("#resultTable").tabulator({
@@ -86,8 +142,8 @@ function jsFilters(page){
         'limit': jQuery('#limit').val(),  
         'year' : jQuery('#year').val(),
         'region' : jQuery('#region').val(),
-        'muni' : jQuery('#muni').val(),
-        'city' : jQuery('#city').val(),       
+        'muni' : jQuery('#province').val(),
+        'city' : jQuery('#municipality').val(),       
         'brgy' : jQuery('#brgy').val(),            
         'psgc' : jQuery('#psgc').val(),                    
         'hh_id' : jQuery('#hh_id').val(),
@@ -161,7 +217,7 @@ function jsShowSummary(){
                 <strong>Region:</strong><br>
                 <select id="region" name="region" class="chosen" multiple="multiple" data-placeholder="-">                    
                     @foreach($_region AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
+                        <option value="{{ $r->REGION_ID }}">{{ $r->REGION_NAME }}</option>
                     @endforeach
                 </select>
                 <small class="desc" style="margin:0px;">select as many region</small>
@@ -169,27 +225,21 @@ function jsShowSummary(){
             <p>
                 <strong>Province:</strong><br>
                 <select id="province" name="province" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_province AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <option value=""></option>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many province</small>
             </p>
             <p>
                 <strong>Municipality:</strong><br>
                 <select id="municipality" name="municipality" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_municipality AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <option value=""></option>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many municipality</small>
             </p>
             <p>
                 <strong>Barangay:</strong><br>
                 <select id="brgy" name="brgy" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_brgy AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <option value=""></option>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many barangay</small>
             </p>            
@@ -235,7 +285,16 @@ function jsShowSummary(){
                     @endforeach
                 </select>
                 <small class="desc" style="margin:0px;">Select as many month</small>
-            </p>            
+            </p>     
+            <p>
+                <strong>Period:</strong><br>
+                <select id="period" name="period" class="chosen" multiple="multiple" data-placeholder="-">                    
+                    @foreach($_period AS $r)
+                    <option value="{{ $r }}">{{ $r }}</option>
+                    @endforeach
+                </select>
+                <small class="desc" style="margin:0px;">Select as many period</small>
+            </p>       
         </div>               
         <div class="one_fourth">
             <p>
@@ -258,13 +317,9 @@ function jsShowSummary(){
                 <small class="desc" style="margin:0px;">Household ID of the beneficiary. search type : ---%</small>
             </p> 
             <p>
-                <strong>Period:</strong><br>
-                <select id="period" name="period" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_period AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
-                </select>
-                <small class="desc" style="margin:0px;">Select as many period</small>
+                <strong>Birthday:</strong><br>
+                <input style="padding:5px 5px;" type="text" name="bday" id="bday" class="longinput">
+                <small class="desc" style="margin:0px;">Birthday. search type : xxxx-xx-xx% (year-month-day)</small>
             </p>              
         </div>   
         <div class="one_fourth last">            
@@ -284,11 +339,7 @@ function jsShowSummary(){
                 <input style="padding:5px 5px;" type="text" name="middlename" id="middlename" class="longinput">
                 <small class="desc" style="margin:0px;">Middlename of the beneficiary. search type : ---%</small>
             </p>
-             <p>
-                <strong>Birthday:</strong><br>
-                <input style="padding:5px 5px;" type="text" name="bday" id="bday" class="longinput">
-                <small class="desc" style="margin:0px;">Birthday. search type : xxxx-xx-xx% (year-month-day)</small>
-            </p>
+            
         </div>           
         <br clear="all">
     </div>

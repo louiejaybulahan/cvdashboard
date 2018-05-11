@@ -70,8 +70,8 @@
 	</div><!--header-->
     <!-- END OF HEADER -->
     
-    <!-- START OF MAIN CONTENT -->
-    <div class="mainwrapper lefticon">
+    <!-- START OF MAIN CONTENT lefticon-->
+    <div class="mainwrapper ">
      	<div class="mainwrapperinner">         	
 				<div class="mainleft">
 					<div class="mainleftinner">
@@ -80,7 +80,7 @@
 							<ul>
 								<li><a href="{{ route('site.index') }}" class="dashboard"><span>Dashboard</span></a></li>
                 <li><a href="{{ route('users.index') }}" class="users"><span>Users</span></a></li>								
-                <li><a href="{{ route('listeducation.index') }}" class="widgets"><span>List</span></a></li>								
+                <li><a href="{{ route('listfds.index') }}" class="widgets"><span>List</span></a></li>								
                 <li><a href="{{ route('uploadfile.index') }}" class="widgets"><span>Import Files</span></a></li>
                 <!-- li><a href="{{ route('uploadfilenoncom.index') }}" class="widgets"><span>Upload Non Complaint</span></a></li -->
                                 
@@ -103,21 +103,21 @@
 								<li><a href="./404.html" class="error"><span>Error Pages</span></a></li -->
 							</ul>
 								
-						</div><!--leftmenu-->
-						<div id="togglemenuleft" class="toggle"><a></a></div>
+						</div><!--leftmenu toggle-->
+						<div id="togglemenuleft" class=""><a></a></div>
 					</div><!--mainleftinner-->
 				</div><!--mainleft-->
 
 				<div class="maincontent @yield('optLayout')">
 					<div class="maincontentinner">
 							<ul class="maintabmenu">
-                @if(isset($header) AND is_array($header))  
-                    @foreach($header as $m)
-                        <li class="{{ $m['selected'] }}"><a href="{{ $m['url'] }}">{{ $m['title'] }}</a></li>
-                    @endforeach
-                @else
-                    <li class="current"><a href="#">@yield('title') </a></li>
-                @endif
+                                @if(isset($header) AND is_array($header))  
+                                    @foreach($header as $m)
+                                        <li class="{{ $m['selected'] }}"><a href="{{ $m['url'] }}">{{ $m['title'] }}</a></li>
+                                    @endforeach
+                                @else
+                                    <li class="current"><a href="#">@yield('title') </a></li>
+                                @endif
 							</ul><!--maintabmenu-->		
               
 							<div class="content">                              
