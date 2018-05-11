@@ -106,3 +106,5 @@ Route::get('profile','SiteController@index')->name('profile');
 
 Route::get('error',function(){ return view('error'); });
 
+require_once('web_route1.php');
+require_once('web_route2.php');
