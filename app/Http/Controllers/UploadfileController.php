@@ -39,7 +39,7 @@ class UploadfileController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {                         
+    public function index(Request $request) {           
         return view('uploadfile.index');
     }       
     // upload multiple files
@@ -74,14 +74,14 @@ class UploadfileController extends Controller {
                 $session['numberOfFiles'] = count($session['list']);
                 $session['position'] = 0;
                 $session['startTime'] = microtime(true); 
-                $session['limit'] = 2000;
+                $session['limit'] = 2000;                
                 $session['currentRow'] = 1;
                 $session['option'] = $request->input('option');
                 $session['period'] = $request->input('period');
                 $session['year'] = $request->input('year');
                 $request->session()->put('uploadbasefile',$session);
             }
-        }else{ $errors = $validate->errors()->all(); }                  
+        }else{ $errors = $validate->errors()->all(); }                      
         return response()->json(['flag' => $flag,'msg' => 'Successfully Save', 'error' => $errors]);
     }   
 
@@ -113,7 +113,8 @@ class UploadfileController extends Controller {
         ]);
     }
     */
-    public function renderFile(Request $request){             
+    public function renderFile(Request $request){    
+        \ini_set("memory_limit",-1);                 
         $destination = config('constants.path_uploaded_data'); 
         $session = $request->session()->get('uploadbasefile');  
         $path = null;
@@ -134,13 +135,3 @@ class UploadfileController extends Controller {
         ]);             
     }
 }
-
-/*
-    $objReader = new \PHPExcel_Reader_Excel2007();            
-    $objReader->setReadDataOnly(true);        
-    $spreadsheet = $objReader->load($path);        
-    $sheet = $spreadsheet->getActiveSheet();
-    $sheet->getCell('A'.$index)->getFormattedValue();
-    $sheet->getCell('M'.$index)->getStyle()->getNumberFormat()->
-            */
-            

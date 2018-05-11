@@ -17,43 +17,44 @@ class TblTurnOut extends Model
         'encoded_under_forcem','non_compliant', 'compliant','remarks_1', 'remarks_2', 'remarks_3', 'remarks_4', 
         'year','period','month','client_status','sex','grade_group','ip','psgc_brgy'];  
 
-    protected $skipColumn = ['id','psgc_brgy','year'];    
-    protected $exactQuery = ['id','psgc_brgy'];
-    protected $likeQuery = [];
+    protected $skipColumn = ['id','hh_id','entry_id','lastname','firstname','middlename','ext','birthday','brgy_id','year','brgy','psgc','REGION_ID','PROVINCE_ID','CITY_ID','BRGY_ID'];    
+    protected $exactQuery = ['id','hh_id','entry_id','ext','birthday','brgy_id','ext'];
+    protected $likeQuery = ['lastname','firstname','middlename','birthday'];
+    protected $otherTablColumn = ['REGION_ID' => 'lib_regions.REGION_ID','PROVINCE_ID' => 'lib_provinces.PROVINCES_ID','CITY_ID' => 'lib_cities.CITY_ID','BRGY_ID' => 'lib_brgy.BRGY_ID'];
 
     protected $filters;
-    protected $region = [];
-    protected $province = [];
-    protected $city = [];
-    protected $brgy = [];
-    protected $category = [];    
-    protected $set = [];    
-    protected $setgroup = [];    
-    protected $eligibility = [];    
-    protected $not_attend_dominant = [];    
-    protected $attend_dominant = [];    
-    protected $attend_del_dominant = [];    
-    protected $outside = [];    
-    protected $monitored_dominant = [];    
-    protected $endcoded_approved = [];    
-    protected $submitted_deworming = [];    
-    protected $not_encoded_approved = [];    
-    protected $encoded_under_forcem = [];    
-    protected $non_compliant = [];    
-    protected $compliant = [];    
-    protected $remarks_1 = [];    
-    protected $remarks_2 = [];    
-    protected $remarks_3 = [];    
-    protected $remarks_4 = [];    
-    protected $year = [];    
-    protected $period = [];    
-    protected $month = [];    
-    protected $client_status = [];    
-    protected $sex = [];    
-    protected $grade_group = [];    
-    protected $ip = [];    
-    protected $psgc_brgy = [];        
-    protected $currentYear;
+    // protected $region = [];
+    // protected $province = [];
+    // protected $city = [];
+    // protected $brgy = [];
+    // protected $category = [];    
+    // protected $set = [];    
+    // protected $setgroup = [];    
+    // protected $eligibility = [];    
+    // protected $not_attend_dominant = [];    
+    // protected $attend_dominant = [];    
+    // protected $attend_del_dominant = [];    
+    // protected $outside = [];    
+    // protected $monitored_dominant = [];    
+    // protected $endcoded_approved = [];    
+    // protected $submitted_deworming = [];    
+    // protected $not_encoded_approved = [];    
+    // protected $encoded_under_forcem = [];    
+    // protected $non_compliant = [];    
+    // protected $compliant = [];    
+    // protected $remarks_1 = [];    
+    // protected $remarks_2 = [];    
+    // protected $remarks_3 = [];    
+    // protected $remarks_4 = [];    
+    // protected $year = [];    
+    // protected $period = [];    
+    // protected $month = [];    
+    // protected $client_status = [];    
+    // protected $sex = [];    
+    // protected $grade_group = [];    
+    // protected $ip = [];    
+    // protected $psgc_brgy = [];        
+    // protected $currentYear;    
     protected $sort = 'ASC';
 	
     public $query  = '';
@@ -86,22 +87,27 @@ class TblTurnOut extends Model
         }
         
         $hasUnion = false;
-        foreach($this->search['year'] AS $y){
-            if($hasUnion==true) $this->query .= ' UNION ALL ';
+    	foreach($this->search['year'] AS $y){
+    		if($hasUnion==true) $this->query .= ' UNION ALL ';
             $hasWhere = $this->hasWhere($y);
-            $select = '';
+            $select = '';            
             if($this->search['count']==false){
                 if(is_array($this->search['select'])){                    
+                    $this->search['select'] = array_merge($this->search['select'],['lib_brgy.BRGY_NAME','lib_cities.CITY_NAME','lib_provinces.PROVINCE_NAME','lib_regions.REGION_NAME']);
                     $select = implode('\',\'',$this->search['select']);
-                }else{ $select = $this->table.$y.'.*'; }
+                }else{ $select = $this->table.$y.'.*, lib_brgy.BRGY_NAME,lib_cities.CITY_NAME,lib_provinces.PROVINCE_NAME,lib_regions.REGION_NAME'; }
             }else{                 
                 if(is_array($this->search['select'])){
                     $select = implode('\',\'',$this->search['select']);
                 }else{ $select = 'COUNT(*) AS total'; }
             }
-            $this->query .= 'SELECT \''.$y.'\' As y,'.$select.' FROM '.$this->table.$y.(isset($hasWhere)?' WHERE '.$hasWhere:'');
-            $hasUnion = true;
-        }
+            $leftJoin = ' LEFT JOIN lib_brgy ON lib_brgy.BRGY_ID='.$this->table.$y.'.brgy_id
+                          LEFT JOIN lib_cities ON lib_cities.CITY_ID=lib_brgy.CITY_ID 
+                          LEFT JOIN lib_provinces ON lib_provinces.PROVINCE_ID=lib_cities.PROVINCE_ID
+                          LEFT JOIN lib_regions ON lib_regions.REGION_ID=lib_provinces.REGION_ID ';
+    		$this->query .= 'SELECT \''.$y.'\' As y,'.$select.' FROM '.$this->table.$y.$leftJoin.(isset($hasWhere)?' WHERE '.$hasWhere:'');
+    		$hasUnion = true;
+    	}
         $order = '';
         if($this->search['order'] != '-'){ $order = ' ORDER BY '. $this->search['order'] .' '.(($this->search['sort']!='-')?$this->search['sort']:$this->sort); }
         $limit = '';
@@ -109,7 +115,7 @@ class TblTurnOut extends Model
             $limit = ' LIMIT '.$this->search['page'].','.$this->search['limit'];
         }
         $this->query = $this->query.$order.$limit;           
-        return $this->query;        
+        return $this->query;      
     }
     protected function hasWhere($year){    	
         $where = null;                    
@@ -117,7 +123,10 @@ class TblTurnOut extends Model
         foreach($this->column AS $toSearch){     
             if(isset($this->search[$toSearch]) AND $this->search[$toSearch]!='null'){
                 if(!in_array($toSearch, $this->skipColumn)){                
-                    $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` REGEXP \''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\'';                
+                    $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` REGEXP \''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\'';
+                }
+                else if(isset($this->otherTablColumn[$toSearch])){
+                    $where .= (($where!=null)?' AND ':'') . ' '.$this->otherTablColumn[$toSearch].' IN (\''. ((count($this->search[$toSearch])>1)?implode('|',$this->search[$toSearch]):current($this->search[$toSearch])) .'\')';
                 }
                 else if(in_array($toSearch,$this->exactQuery)){                                        
                     $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` = \''.$this->search[$toSearch].'\'';
@@ -126,7 +135,7 @@ class TblTurnOut extends Model
                     $where .= (($where!=null)?' AND ':'') . ' `'.$this->table.$year.'`.`'.$toSearch.'` LIKE \''.$this->search[$toSearch].'%\'';
                 }
             }
-        }                              
+        }                      
     	return $where;
     }
   

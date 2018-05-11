@@ -30,12 +30,7 @@ class ListTurnoutController extends Controller {
      */
     public function index(Request $request) {                     
         $currentYear = date('Y');                
-        $period = [];
-        $region = [];
-        $province = [];
-        $city = [];
-        $brgy = [];
-        $psgc_brgy = [];        
+        $period = [];           
         $category = [];
         $set = [];
         $setgroup = [];
@@ -62,13 +57,7 @@ class ListTurnoutController extends Controller {
             
         $model = \App\Models\FiltersTurnout::all();
         foreach($model AS $r){
-            $year[] = $r->year;
-            $period = array_merge($period,json_decode($r->period));
-            $region = array_merge($region,json_decode($r->region));
-            $province = array_merge($province,json_decode($r->province));
-            $city = array_merge($city,json_decode($r->city));
-            $brgy = array_merge($brgy,json_decode($r->brgy));
-            $psgc_brgy = array_merge($psgc_brgy,json_decode($r->psgc_brgy));
+            $year[] = $r->year;                        
             $category = array_merge($category,json_decode($r->category));
             $set = array_merge($set,json_decode($r->set));
             $setgroup = array_merge($setgroup,json_decode($r->setgroup));
@@ -94,12 +83,7 @@ class ListTurnoutController extends Controller {
             $ip = array_merge($ip,json_decode($r->ip));
         }         
         
-        $_period = array_unique($period);
-        $_region = array_unique($region);
-        $_province = array_unique($province);
-        $_municipality = array_unique($municipality);
-        $_brgy = array_unique($brgy);    
-        $_psgc_brgy = array_unique($psgc_brgy);
+        $_period = array_unique($period);               
         $_category = array_unique($category);
         $_set = array_unique($set);
         $_setgroup = array_unique($setgroup);
@@ -125,13 +109,7 @@ class ListTurnoutController extends Controller {
         $_ip = array_unique($ip);
                          
         sort($year);
-        sort($_period);
-        sort($_region);
-        sort($_province);
-        sort($_municipality);
-        sort($_brgy);        
-
-        sort($_psgc_brgy);
+        sort($_period);        
         sort($_category);
         sort($_set);
         sort($_setgroup);
@@ -148,8 +126,7 @@ class ListTurnoutController extends Controller {
         sort($_remarks_1);
         sort($_remarks_2);
         sort($_remarks_3);
-        sort($_remarks_4);    
-            
+        sort($_remarks_4);                
         sort($_month);  
         sort($_client_status);
         sort($_sex);
@@ -157,19 +134,14 @@ class ListTurnoutController extends Controller {
         sort($_ip);
         
         
-                
+        $_region = \App\Models\LibRegions::all();           
         return view('listturnout.index',[            
             '_period' => $_period,
-            '_region' => $_region,
-            '_province' => $_province,
-            '_municipality' => $_municipality,
-            '_brgy' => $_brgy,
-            '_psgc' => $_psgc,
+            '_region' => $_region,            
             '_hh_status' => $_hh_status,
             '_ip' => $_ip,
             '_sex' => $_sex,
             '_month' => $_month,
-
             '_year' => $year,
             '_currentyear' => $currentYear
         ]); 
@@ -258,11 +230,10 @@ class ListTurnoutController extends Controller {
         $counter = $offset + 1;        
         $model = new TblNonCompliantFds();        
         $model->search = [  
-            'region' => $request->region,
-            'province' => $request->province,
-            'municipality' => $request->municipality,
-            'brgy' => $request->brgy,           
-            'psgc' => $request->psgc,
+            'REGION_ID' => $request->region,
+            'PROVINCE_ID' => $request->province,
+            'CITY_ID' => $request->muni,
+            'BRGY_ID' => $request->brgy,                   
             'hh_status' => $request->hh_status,
             'hh_id' => $request->hh_id,
             'entry_id' => $request->entry_id,            
@@ -291,11 +262,10 @@ class ListTurnoutController extends Controller {
             foreach($data AS $r){
                 $list[] = [                    
                     'counter' => $counter,
-                    'region' => $r->region,
-                    'province' => $r->province,
-                    'municipality' => $r->municipality,
-                    'brgy' => $r->brgy,
-                    'psgc' => $r->psgc,
+                    'region' => $r->REGION_NAME,
+                    'province' => $r->PROVINCE_NAME,
+                    'muni' => $r->CITY_NAME,
+                    'brgy' => $r->BRGY_NAME,          
                     'hh_status' => $r->hh_status,
                     'hh_id' => $r->hh_id,
                     'entry_id' => $r->entry_id,
@@ -359,100 +329,229 @@ class ListTurnoutController extends Controller {
             'period' => $period,
         ]);
     } 
-     public function rebuildfilter(){
-         \ini_set('memory_limit','-1');
+    public function rebuildfilter(){
+        \ini_set('memory_limit','-1');
         \ini_set('max_execution_time', 0); 
     
-        $table = 'tbl_noncomp_fds_';
+        $year = 2017;
+        $period = 1;
+        $table = 'tbl_turnout_'.$year.'_'.$period;
         $config = \App\Config::getValue(['PERIOD_START','PERIOD_CURRENT']);        
         $year = $config['PERIOD_CURRENT'];        
-                
-        $column = 'period';
-        $period = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
+                 
+        $column = 'category';
+        $category = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
         foreach($result AS $r){
-            $period[] = $r->{$column};
-        }
-
-        $column = 'region';
-        $region = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $region[] = $r->{$column};
-        }
-        
-        $column = 'province';
-        $province = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $province[] = $r->{$column};
-        }
-        
-        $column = 'municipality';
-        $municipality = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $municipality[] = $r->{$column};
-        }
-        
-        $column = 'brgy';
-        $brgy = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $brgy[] = $r->{$column};
-        }
-                
-        $column = 'psgc';
-        $psgc = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
-        foreach($result AS $r){
-            $psgc[] = $r->{$column};
-        }
-        
-        $column = 'hh_status';
-        $hh_status = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();        
-        foreach($result AS $r){
-            $hh_status[] = $r->{$column};
+            $category[] = $r->{$column};
         }  
 
-        $column = 'ip';
-        $ip = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();        
+        $column = 'set';
+        $set = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
         foreach($result AS $r){
-            $ip[] = $r->{$column};
+            $set[] = $r->{$column};
         }  
         
-        $column = 'sex';
-        $sex = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();        
+        $column = 'setgroup';
+        $setgroup = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
         foreach($result AS $r){
-            $sex[] = $r->{$column};
+            $setgroup[] = $r->{$column};
         }
 
+        $column = 'eligibility';
+        $eligibility = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $eligibility[] = $r->{$column};
+        }
+        
+        $column = 'not_attend_dominant';
+        $not_attend_dominant = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $not_attend_dominant[] = $r->{$column};
+        }  
+        
+        $column = 'attend_dominant';
+        $attend_dominant = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $attend_dominant[] = $r->{$column};
+        }  
+        
+        $column = 'attend_del_dominant';
+        $attend_del_dominant = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $attend_del_dominant[] = $r->{$column};
+        }  
+        
+        $column = 'outside';
+        $outside = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $outside[] = $r->{$column};
+        }  
+
+        $column = 'monitored_dominant';
+        $monitored_dominant = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $monitored_dominant[] = $r->{$column};
+        }  
+        
+        $column = 'encoded_approved';
+        $encoded_approved = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $encoded_approved[] = $r->{$column};
+        }  
+        
+        $column = 'eligibility';
+        $eligibility = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $eligibility[] = $r->{$column};
+        }          
+        
+        $column = 'submitted_deworming';
+        $submitted_deworming = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $submitted_deworming[] = $r->{$column};
+        }  
+        
+        $column = 'not_encoded_approved';
+        $not_encoded_approved = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $not_encoded_approved[] = $r->{$column};
+        }          
+        
+        $column = 'encoded_under_forcem';
+        $encoded_under_forcem = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $encoded_under_forcem[] = $r->{$column};
+        }  
+        
+        $column = 'non_compliant';
+        $non_compliant = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $non_compliant[] = $r->{$column};
+        }          
+        
+        $column = 'compliant';
+        $compliant = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $compliant[] = $r->{$column};
+        }  
+        
+        $column = 'remarks_1';
+        $remarks_1 = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $remarks_1[] = $r->{$column};
+        }  
+        
+        $column = 'remarks_2';
+        $remarks_2 = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $remarks_2[] = $r->{$column};
+        }     
+
+        $column = 'remarks_3';
+        $remarks_3 = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $remarks_3[] = $r->{$column};
+        } 
+        
+        $column = 'remarks_3';
+        $remarks_3 = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $remarks_3[] = $r->{$column};
+        } 
+        
+        $column = 'remarks_4';
+        $remarks_4 = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $remarks_4[] = $r->{$column};
+        } 
+        
         $column = 'month';
         $month = [];
-        $result = DB::table($table.$year)->select($column)->groupBy($column)->get();        
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
         foreach($result AS $r){
             $month[] = $r->{$column};
-        }  
+        }     
+
+        $column = 'client_status';
+        $client_status = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $client_status[] = $r->{$column};
+        }   
+
+        $column = 'sex';
+        $sex = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $sex[] = $r->{$column};
+        }            
+
+        $column = 'grade_group';
+        $grade_group = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $remarks_2[] = $r->{$column};
+        }    
         
+        $column = 'ip';
+        $ip = [];
+        $result = DB::table($table)->select($column)->groupBy($column)->get();        
+        foreach($result AS $r){
+            $ip[] = $r->{$column};
+        }    
+                            
         $data = [    
             'id' => null,            
             'year' => $year,            
-            'period' => json_encode($period),            
-            'region' => json_encode($region),
-            'province' => json_encode($province),
-            'municipality' => json_encode($municipality),            
-            'brgy' => json_encode($brgy),
-            'psgc' => json_encode($psgc),            
-            'hh_status' => json_encode($hh_status),
-            'ip' => json_encode($ip),
+            'period' => $period,
+            'category' => json_encode($category),            
+            'set' => json_encode($set),            
+            'setgroup' => json_encode($setgroup),            
+            'eligibility' => json_encode($eligibility),                                  
+            'not_attend_dominant' => json_encode($not_attend_dominant),            
+            'attend_dominant' => json_encode($attend_dominant),            
+            'attend_del_dominant' => json_encode($attend_del_dominant),            
+            'outside' => json_encode($outside),            
+            'monitored_dominant' => json_encode($monitored_dominant),            
+            'encoded_approved' => json_encode($encoded_approved),            
+            'submitted_deworming' => json_encode($submitted_deworming),            
+            'not_encoded_approved' => json_encode($not_encoded_approved),            
+            'encoded_under_forcem' => json_encode($encoded_under_forcem),            
+            'non_compliant' => json_encode($non_compliant),            
+            'compliant' => json_encode($compliant),       
+            'remarks_1' => json_encode($remarks_1),            
+            'remarks_2' => json_encode($remarks_2),            
+            'remarks_3' => json_encode($remarks_3),            
+            'remarks_4' => json_encode($remarks_4),            
+            'month' => json_encode($month),                    
+            'client_status' => json_encode($client_status),            
             'sex' => json_encode($sex),            
-            'month' => json_encode($month),            
+            'grade_group' => json_encode($grade_group),                
+            'ip' => json_encode($ip),                        
         ];
                 
-        $filters = new \App\Models\FiltersFds();
+        $filters = new \App\Models\FiltersTurnout();
         $return = $filters->where('year',$year)->first();        
         if(empty($return)){            
             $id = $filters->insertGetId($data);              
@@ -461,5 +560,5 @@ class ListTurnoutController extends Controller {
             unset($data['year']);
             $filters->where('year',$year)->update($data);
         }
-    }          
+    }             
 }
