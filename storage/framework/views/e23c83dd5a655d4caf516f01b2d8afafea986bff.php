@@ -1,43 +1,34 @@
-@extends('layouts.main',[
-    'header' => [
-        ['url' => '#','title' => 'List of Turnout','selected' => ''],
-        ['url' => route('listeducation.index'),'title' => 'List of Non Compliant of Education','selected' => ''],
-        ['url' => route('listhealth.index'),'title'  => 'List of Non Compliant of Health','selected' => ''],
-        ['url' => route('listfds.index'),'title'  => 'List of Non Compliant of FDS','selected' => 'current']
-    ]
-])
+<?php $__env->startSection('title', 'List of Beneficiary'); ?>
+<?php $__env->startSection('optLayout','noright'); ?>
 
-@section('title', 'List of Beneficiary')
-@section('optLayout','noright')
-
-@section('cssExtention')
+<?php $__env->startSection('cssExtention'); ?>
 <link rel="stylesheet" href="js/modal/jquery.modal.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="js/chosen/chosen.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="{{ asset('js/jquery-confirm/css/jquery-confirm.css') }}" type="text/css" media="screen" />
+<link rel="stylesheet" href="<?php echo e(asset('js/jquery-confirm/css/jquery-confirm.css')); ?>" type="text/css" media="screen" />
 <style>
 .dataTables_wrapper input { border: 1px solid #ccc; padding: 6px 5px 7px 5px; width: auto; }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('jsExtention')
-<script type="text/javascript" src="{{ asset('js/plugins/jquery.dataTables.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/plugins/jquery.jgrowl.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/modal/jquery.modal.min.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/chosen/chosen.jquery.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/chosen/init.js') }}"></script>
+<?php $__env->startSection('jsExtention'); ?>
+<script type="text/javascript" src="<?php echo e(asset('js/plugins/jquery.dataTables.min.js')); ?>"></script>
+<script type="text/javascript" src="<?php echo e(asset('js/plugins/jquery.jgrowl.js')); ?>"></script>
+<script type="text/javascript" src="<?php echo e(asset('js/modal/jquery.modal.min.js')); ?>"></script>
+<script type="text/javascript" src="<?php echo e(asset('js/chosen/chosen.jquery.js')); ?>"></script>
+<script type="text/javascript" src="<?php echo e(asset('js/chosen/init.js')); ?>"></script>
 
-<link href="{{ asset('js/tabulator/dist/css/tabulator.css') }}" rel="stylesheet">
-<script type="text/javascript" src="{{ asset('js/tabulator/dist/js/tabulator.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/jquery-confirm/js/jquery-confirm.js') }}"></script>
+<link href="<?php echo e(asset('js/tabulator/dist/css/tabulator.css')); ?>" rel="stylesheet">
+<script type="text/javascript" src="<?php echo e(asset('js/tabulator/dist/js/tabulator.js')); ?>"></script>
+<script type="text/javascript" src="<?php echo e(asset('js/jquery-confirm/js/jquery-confirm.js')); ?>"></script>
 
 <script type="text/javascript">
 jQuery(document).ready(function () {
     jQuery('#region').change(function(){
         var tmp = new Array();
         var select = '#province';
-        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};        
+        var dataString = {'_token':'<?php echo e(csrf_token()); ?>', 'id':jQuery(this).val()};        
             jQuery.ajax({
-                type: "POST", url:'{{ route('listeducation.getprovince') }}', data: dataString, dataType: 'json', cache: false,
+                type: "POST", url:'<?php echo e(route('listeducation.getprovince')); ?>', data: dataString, dataType: 'json', cache: false,
                 error: function (request, status, error) { jsMessage('Error Request'); },
                 success: function (data) {
                     tmp = $(select).val();
@@ -54,9 +45,9 @@ jQuery(document).ready(function () {
     jQuery('#province').change(function(){
         var tmp = new Array();
         var select = '#municipality';        
-        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};         
+        var dataString = {'_token':'<?php echo e(csrf_token()); ?>', 'id':jQuery(this).val()};         
             jQuery.ajax({
-                type: "POST", url:'{{ route('listeducation.getmunicipality') }}', data: dataString, dataType: 'json', cache: false,
+                type: "POST", url:'<?php echo e(route('listeducation.getmunicipality')); ?>', data: dataString, dataType: 'json', cache: false,
                 error: function (request, status, error) { jsMessage('Error Request'); },
                 success: function (data) {
                     tmp = $(select).val();
@@ -73,9 +64,9 @@ jQuery(document).ready(function () {
     jQuery('#municipality').change(function(){
         var tmp = new Array();
         var select = '#brgy';
-        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
+        var dataString = {'_token':'<?php echo e(csrf_token()); ?>', 'id':jQuery(this).val()};
             jQuery.ajax({
-                type: "POST", url:'{{ route('listeducation.getbrgy') }}', data: dataString, dataType: 'json', cache: false,
+                type: "POST", url:'<?php echo e(route('listeducation.getbrgy')); ?>', data: dataString, dataType: 'json', cache: false,
                 error: function (request, status, error) { jsMessage('Error Request'); },
                 success: function (data) {
                     tmp = $(select).val();
@@ -135,7 +126,7 @@ jQuery(document).ready(function () {
         else{ jQuery('.optHousehold').prop('checked',false); }
     });
     jQuery('#btnRebuild').click(function(){
-        jQuery.getJSON('{{ route('listfds.rebuildfilter') }}',function(data){
+        jQuery.getJSON('<?php echo e(route('listfds.rebuildfilter')); ?>',function(data){
             location.reload();
         });
     });
@@ -148,7 +139,7 @@ jQuery(document).ready(function () {
 function jsMessage(message) { jQuery.jGrowl(message); return false; }
 function jsFilters(page){
     return {
-        '_token':'{{ csrf_token() }}',                
+        '_token':'<?php echo e(csrf_token()); ?>',                
         'page' : page,
         'order' : jQuery('#order').val(),
         'sort' : jQuery('#sort').val(),        
@@ -192,7 +183,7 @@ function jsSearchData(page){
     var dataString = jsFilters(page);          
     jQuery('#loading').show();
     jQuery.ajax({
-        type: "POST", url:'{{ route('listturnout.search') }}', data: dataString, dataType: 'json', cache: false,        
+        type: "POST", url:'<?php echo e(route('listturnout.search')); ?>', data: dataString, dataType: 'json', cache: false,        
         error: function (request, status, error) { jsMessage('Error Request'); },
         success: function (data) {              
             startPage = 1;
@@ -216,16 +207,16 @@ function jsSearchData(page){
 }
 function jsShowSummary(){
     event.preventDefault();
-    jQuery.get('{{ route('listfds.summary') }}', function(html) { jQuery('#divSummary').html(html).modal({width:'1000px'}); });
+    jQuery.get('<?php echo e(route('listfds.summary')); ?>', function(html) { jQuery('#divSummary').html(html).modal({width:'1000px'}); });
     return false;
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div id="divSummary" width="1000px;"></div>
-{{ Form::open(['route' => 'listfds.search','class' => 'stdform','id' => 'formUser','novalidate' => 'novalidate' ]) }}        
+<?php echo e(Form::open(['route' => 'listfds.search','class' => 'stdform','id' => 'formUser','novalidate' => 'novalidate' ])); ?>        
 <div class="widgetbox">
     <div class="title widgettoggle"><h2 class="general"><span>Filters</span></h2></div>        
     <div class="widgetcontent" style="display:block;">
@@ -233,41 +224,41 @@ function jsShowSummary(){
             <p>
                 <strong>Year:</strong><br>
                 <select id="year" name="year" class="chosen" multiple="multiple" data-placeholder="-">                            
-                    @php
+                    <?php 
                         $detect = false;
                         foreach($_year AS $r):
                             $selected = ($detect==false)?'selected="selected"':'';
                             echo '<option value="'.$r.'" '.$selected.'>'.$r.'</option>';
                             $detect = true;
                         endforeach;
-                    @endphp
+                     ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many </small>
             </p>   
             <p>
                 <strong>Period:</strong><br>
                 <select id="period" name="period" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_period AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_period; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>  
             <p>
                 <strong>Month:</strong><br>
                 <select id="month" name="month" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_month AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_month; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>
              <p>
                 <strong>Region:</strong><br>
                 <select id="region" name="region" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_region AS $r)
-                        <option value="{{ $r->REGION_ID }}">{{ $r->REGION_NAME }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_region; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($r->REGION_ID); ?>"><?php echo e($r->REGION_NAME); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">select as many</small>
             </p>
@@ -295,9 +286,9 @@ function jsShowSummary(){
             <p>
                 <strong>IP:</strong><br>
                 <select id="ip" name="ip" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_ip AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_ip; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>                     
@@ -306,63 +297,63 @@ function jsShowSummary(){
             <p>
                 <strong>Category:</strong><br>
                 <select id="category" name="category" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_category AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_category; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>
             <p>
                 <strong>Set:</strong><br>
                 <select id="set" name="set" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_set AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_set; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>
             <p>
                 <strong>Set Group:</strong><br>
                 <select id="setgroup" name="setgroup" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_setgroup AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_setgroup; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p> 
             <p>
                 <strong>Eligibility:</strong><br>
                 <select id="eligibility" name="eligibility" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_eligibility AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_eligibility; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>    
             <p>
                 <strong>Not Attending Dominant:</strong><br>
                 <select id="not_attend_dominant" name="not_attend_dominant" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_not_attend_dominant AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_not_attend_dominant; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>  
             <p>
                 <strong>Attend Deleted Dominant:</strong><br>
                 <select id="attend_del_dominant" name="attend_del_dominant" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_attend_del_dominant AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_attend_del_dominant; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p> 
             <p>
                 <strong>Outside:</strong><br>
                 <select id="outside" name="outside" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_outside AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_outside; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>       
@@ -371,63 +362,63 @@ function jsShowSummary(){
             <p>
                 <strong>Monitored Dominant:</strong><br>
                 <select id="monitored_dominant" name="monitored_dominant" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_outside AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_outside; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>
             <p>
                 <strong>Encoded Approved:</strong><br>
                 <select id="encoded_approved" name="encoded_approved" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_encoded_approved AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_encoded_approved; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>
             <p>
                 <strong>Submitted Deworming:</strong><br>
                 <select id="submitted_deworming" name="submitted_deworming" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_submitted_deworming AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_submitted_deworming; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many</small>
             </p>
             <p>
                 <strong>Not Encoded Approved:</strong><br>
                 <select id="not_encoded_approved" name="not_encoded_approved" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_not_encoded_approved AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_not_encoded_approved; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>
             <p>
                 <strong>Encoded Under Force Majuore:</strong><br>
                 <select id="encoded_under_forcem" name="encoded_under_forcem" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_ip AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_ip; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>
             <p>
                 <strong>Non Compliant:</strong><br>
                 <select id="non_compliant" name="non_compliant" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_non_compliant AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_non_compliant; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>   
             <p>
                 <strong>Compliant:</strong><br>
                 <select id="compliant" name="compliant" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_compliant AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_compliant; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>         
@@ -436,63 +427,63 @@ function jsShowSummary(){
             <p>
                 <strong>Remarks 1:</strong><br>
                 <select id="remarks_1" name="remarks_1" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_remarks_1 AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_remarks_1; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>
             <p>
                 <strong>Remarks 2:</strong><br>
                 <select id="remarks_2" name="remarks_2" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_remarks_2 AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_remarks_2; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>
             <p>
                 <strong>Remarks 3:</strong><br>
                 <select id="remarks_3" name="remarks_3" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_remarks_3 AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_remarks_3; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>
             <p>
                 <strong>Remarks 4:</strong><br>
                 <select id="remarks_4" name="remarks_4" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_remarks_4 AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_remarks_4; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>            
             <p>
                 <strong>Client Status:</strong><br>
                 <select id="client_status" name="client_status" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_client_status AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_client_status; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>
             <p>
                 <strong>Sex:</strong><br>
                 <select id="sex" name="sex" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_sex AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_sex; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>
             <p>
                 <strong>Grade Group:</strong><br>
                 <select id="grade_group" name="grade_group" class="chosen" multiple="multiple" data-placeholder="-">                    
-                    @foreach($_grade_group AS $r)
-                    <option value="{{ $r }}">{{ $r }}</option>
-                    @endforeach
+                    <?php $__currentLoopData = $_grade_group; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($r); ?>"><?php echo e($r); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
                 <small class="desc" style="margin:0px;">Select as many ip</small>
             </p>                                  
@@ -501,7 +492,8 @@ function jsShowSummary(){
     </div>
 </div>
 
-{{ Form::close() }}
+<?php echo e(Form::close()); ?>
+
 
 <br clear="all">
 <div class="contenttitle radiusbottom0"><h2 class="table"><span>Result</span></h2></div>
@@ -546,7 +538,7 @@ function jsShowSummary(){
         </select>        
         <a href="#search" id="btnSearch" class="stdbtn btn_blue"><span>Search</span></a>   
         <!-- a href="#rebuild" id="btnRebuild" class="stdbtn" ><span>Rebuild Filter</span></a -->
-        &nbsp;&nbsp;&nbsp;<img src="{{ asset('images/loading.gif') }}" id="loading"></img>
+        &nbsp;&nbsp;&nbsp;<img src="<?php echo e(asset('images/loading.gif')); ?>" id="loading"></img>
     </div>
     <div class="dataTables_filter" id="dyntable_filter">        
          <label><strong>Actions :</strong></label>
@@ -565,4 +557,12 @@ function jsShowSummary(){
 </div>    
 <br clear="all">
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.main',[
+    'header' => [
+        ['url' => '#','title' => 'List of Turnout','selected' => ''],
+        ['url' => route('listeducation.index'),'title' => 'List of Non Compliant of Education','selected' => ''],
+        ['url' => route('listhealth.index'),'title'  => 'List of Non Compliant of Health','selected' => ''],
+        ['url' => route('listfds.index'),'title'  => 'List of Non Compliant of FDS','selected' => 'current']
+    ]
+], array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

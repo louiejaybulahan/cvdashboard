@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 //use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\CashGrant;
-use App\Models\TblNonCompliantFds;
+use App\Models\TblTurnOut;
 
 
 class ListTurnoutController extends Controller {
@@ -28,7 +28,8 @@ class ListTurnoutController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {                     
+    public function index(Request $request) {      
+        // echo route('listturnout.show', ['post' => 1]);               
         $currentYear = date('Y');                
         $period = [];           
         $category = [];
@@ -37,12 +38,13 @@ class ListTurnoutController extends Controller {
         $eligibility = [];
         $not_attend_dominant = [];
         $attend_dominant = [];
-        $attend_del_moninant = [];
+        $attend_del_dominant = [];
         $outside = [];
         $monitored_dominant = [];
         $encoded_approved = [];
         $submitted_deworming = [];
-        $not_encoded_under_forcem = [];
+        $not_encoded_approved = [];
+        $encoded_under_forcem = [];
         $non_compliant = [];
         $compliant = [];
         $remarks_1 = [];
@@ -57,19 +59,21 @@ class ListTurnoutController extends Controller {
             
         $model = \App\Models\FiltersTurnout::all();
         foreach($model AS $r){
-            $year[] = $r->year;                        
+            $year[] = $r->year;
+            $period[] = $r->period;
             $category = array_merge($category,json_decode($r->category));
             $set = array_merge($set,json_decode($r->set));
             $setgroup = array_merge($setgroup,json_decode($r->setgroup));
             $eligibility = array_merge($eligibility,json_decode($r->eligibility));
             $not_attend_dominant = array_merge($not_attend_dominant,json_decode($r->not_attend_dominant));
             $attend_dominant = array_merge($attend_dominant,json_decode($r->attend_dominant));
-            $attend_del_moninant = array_merge($attend_del_moninant,json_decode($r->attend_del_moninant));
+            $attend_del_dominant = array_merge($attend_del_dominant,json_decode($r->attend_del_dominant));
             $outside = array_merge($outside,json_decode($r->outside));
             $monitored_dominant = array_merge($monitored_dominant,json_decode($r->monitored_dominant));
             $encoded_approved = array_merge($encoded_approved,json_decode($r->encoded_approved));
             $submitted_deworming = array_merge($submitted_deworming,json_decode($r->submitted_deworming));
-            $not_encoded_under_forcem = array_merge($not_encoded_under_forcem,json_decode($r->not_encoded_under_forcem));
+            $not_encoded_approved = array_merge($not_encoded_approved,json_decode($r->not_encoded_approved));
+            $encoded_under_forcem = array_merge($encoded_under_forcem,json_decode($r->encoded_under_forcem));
             $non_compliant = array_merge($non_compliant,json_decode($r->non_compliant));
             $compliant = array_merge($compliant,json_decode($r->compliant));            
             $remarks_1 = array_merge($remarks_1,json_decode($r->remarks_1));
@@ -80,7 +84,8 @@ class ListTurnoutController extends Controller {
             $client_status = array_merge($client_status,json_decode($r->client_status));
             $sex = array_merge($sex,json_decode($r->sex));
             $grade_group = array_merge($grade_group,json_decode($r->grade_group));
-            $ip = array_merge($ip,json_decode($r->ip));
+            $ip = array_merge($ip,json_decode($r->ip));      
+            
         }         
         
         $_period = array_unique($period);               
@@ -90,12 +95,13 @@ class ListTurnoutController extends Controller {
         $_eligibility = array_unique($eligibility);
         $_not_attend_dominant = array_unique($not_attend_dominant);
         $_attend_dominant = array_unique($attend_dominant);
-        $_attend_del_moninant = array_unique($attend_del_moninant);
+        $_attend_del_dominant = array_unique($attend_del_dominant);
         $_outside = array_unique($outside);
         $_monitored_dominant = array_unique($monitored_dominant);
-        $_encoded_approved = array_unique($encoded_approved);
+        $_encoded_approved = array_unique($encoded_approved);        
+        $_not_encoded_approved = array_unique($not_encoded_approved);
         $_submitted_deworming = array_unique($submitted_deworming);
-        $_not_encoded_under_forcem = array_unique($not_encoded_under_forcem);
+        $_encoded_under_forcem = array_unique($encoded_under_forcem);
         $_non_compliant = array_unique($non_compliant);
         $_compliant = array_unique($compliant);            
         $_remarks_1 = array_unique($remarks_1);
@@ -107,7 +113,7 @@ class ListTurnoutController extends Controller {
         $_sex = array_unique($sex);
         $_grade_group = array_unique($grade_group);
         $_ip = array_unique($ip);
-                         
+                   
         sort($year);
         sort($_period);        
         sort($_category);
@@ -116,11 +122,12 @@ class ListTurnoutController extends Controller {
         sort($_eligibility);
         sort($_not_attend_dominant);
         sort($_attend_dominant);
+        sort($_attend_del_dominant);
         sort($_outside);
         sort($_monitored_dominant);
         sort($_encoded_approved);
-        sort($_submitted_deworming);
-        sort($_not_encoded_under_forcem);
+        sort($_not_encoded_approved);
+        sort($_submitted_deworming);        
         sort($_non_compliant);
         sort($_compliant);
         sort($_remarks_1);
@@ -133,18 +140,35 @@ class ListTurnoutController extends Controller {
         sort($_grade_group);
         sort($_ip);
         
-        
         $_region = \App\Models\LibRegions::all();           
         return view('listturnout.index',[            
             '_period' => $_period,
-            '_region' => $_region,            
-            '_hh_status' => $_hh_status,
-            '_ip' => $_ip,
-            '_sex' => $_sex,
-            '_month' => $_month,
-            '_year' => $year,
-            '_currentyear' => $currentYear
-        ]); 
+            '_region' => $_region,      
+            '_year' => $year,             
+            '_category' => $_category,
+            '_set' => $_set , 
+            '_setgroup' => $_setgroup,
+            '_eligibility' => $_eligibility,
+            '_not_attend_dominant' => $_not_attend_dominant,
+            '_attend_dominant' => $_attend_dominant, 
+            '_attend_del_dominant' => $_attend_del_dominant,
+            '_outside' => $_outside, 
+            '_monitored_dominant' => $_monitored_dominant,
+            '_encoded_approved' => $_encoded_approved, 
+            '_not_encoded_approved' => $_not_encoded_approved, 
+            '_submitted_deworming' => $_submitted_deworming, 
+            '_non_compliant' => $_non_compliant, 
+            '_compliant' => $_compliant, 
+            '_remarks_1' => $_remarks_1, 
+            '_remarks_2' => $_remarks_2, 
+            '_remarks_3' => $_remarks_3, 
+            '_remarks_4' => $_remarks_4, 
+            '_month' => $_month, 
+            '_client_status' => $_client_status, 
+            '_sex' => $_sex, 
+            '_grade_group' => $_grade_group,
+            '_ip' => $_ip, 
+        ]);         
     }
     public function filter(Request $request){          
         $registration = $finalremarks = $program = $set = $bank = $periodcover = $modepayment = ['-'];        
@@ -191,35 +215,11 @@ class ListTurnoutController extends Controller {
             'finalremarks' => $finalremarks,
             'registration' => $registration,
         ]);                  
-    }
-    public function city(Request $request){  
-        $list = null;
-        if($request->id!='null'){
-            $muni = new \App\CityMuni();        
-            $l = $muni->whereIn('prov_id',$request->id)->orderBy('name')->get();        
-            $list = $l->toArray();
-        }
-        return response()->json(['list' => $list]);
-    }
-    public function brgy(Request $request){  
-        $list = null;
-        if($request->id!='null'){
-            $brgyId = [];
-            foreach($request->id AS $r):
-                $tmp = explode('|',$r);
-                $brgyId[] = $tmp[1];
-            endforeach;               
-            $model = new \App\Barangay();        
-            $l = $model->whereIn('mun_id',$brgyId)->orderBy('name')->get();        
-            $list = $l->toArray();
-        }
-        return response()->json(['list' => $list]);
     }       
     public function search(Request $request){
         $counter = 1;
         $list = [];            
         $data = [];
-
         if($request->limit=='' AND $request->limit==null):
             $request->limit = \Config::get('constants.page_limit');
         endif;
@@ -228,25 +228,37 @@ class ListTurnoutController extends Controller {
         endif;        
         $offset = ($request->page - 1) * $request->limit;   
         $counter = $offset + 1;        
-        $model = new TblNonCompliantFds();        
+        $model = new \App\Models\TblTurnOut();        
         $model->search = [  
             'REGION_ID' => $request->region,
             'PROVINCE_ID' => $request->province,
-            'CITY_ID' => $request->muni,
+            'CITY_ID' => $request->city,
             'BRGY_ID' => $request->brgy,                   
-            'hh_status' => $request->hh_status,
-            'hh_id' => $request->hh_id,
-            'entry_id' => $request->entry_id,            
-            'lastname' => $request->lastname,
-            'firstname' => $request->firstname,
-            'middlename' => $request->middlename,
-            'ext' => $request->ext,
-            'birthday' => $request->birthday,
-            'ip' => $request->ip,
-            'sex' => $request->sex,
-            'month' => $request->month,
             'year' => $request->year,
-            'period' => $request->period,                 
+            'period' => $request->period,
+            'category' => $request->category,            
+            'set' => $request->set,
+            'setgroup' => $request->setgroup,
+            'eligibility' => $request->eligibility,
+            'not_attend_dominant' => $request->not_attend_dominant,
+            'attend_dominant' => $request->attend_dominant,
+            'attend_del_dominant' => $request->attend_del_dominant,
+            'outside' => $request->outside,
+            'monitored_dominant' => $request->monitored_dominant,
+            'encoded_approved' => $request->encoded_approved,
+            'submitted_deworming' => $request->submitted_deworming,
+            'not_encoded_approved' => $request->not_encoded_approved,
+            'encoded_under_forcem' => $request->encoded_under_forcem,
+            'non_compliant' => $request->non_compliant,
+            'compliant' => $request->compliant,
+            'remarks_1' => $request->remarks_1,
+            'remarks_2' => $request->remarks_2,
+            'remarks_3' => $request->remarks_3,
+            'remarks_4' => $request->remarks_4,
+            'client_status' => $request->client_status,
+            'sex' => $request->sex,
+            'grade_group' => $request->grade_group,
+            'ip' => $request->ip,
             'page' => $request->page,            
             'order' => $request->order,
             'sort' => $request->sort,
@@ -254,7 +266,7 @@ class ListTurnoutController extends Controller {
             'select' => '',
             'count' => false,
         ];            
-        $model->getQuery();
+        // echo $model->getQuery();
         $data = $model->getData();        
         $request->session()->put('listnoncomplianfds', $model->search);        
         if(!empty($data)){            
@@ -266,19 +278,31 @@ class ListTurnoutController extends Controller {
                     'province' => $r->PROVINCE_NAME,
                     'muni' => $r->CITY_NAME,
                     'brgy' => $r->BRGY_NAME,          
-                    'hh_status' => $r->hh_status,
-                    'hh_id' => $r->hh_id,
-                    'entry_id' => $r->entry_id,
-                    'lastname' => $r->lastname,
-                    'firstname' => $r->firstname,
-                    'middlename' => $r->middlename,
-                    'ext' => $r->ext,  
-                    'birthday' => $r->birthday,
-                    'ip' => $r->ip,
-                    'sex' => $r->sex,
-                    'month' => $r->month,                    
-                    'year' => $r->year,
+                    'year' => $r->year,                    
                     'period' => $r->period,
+                    'category' => $r->category,            
+                    'set' => $r->set,
+                    'setgroup' => $r->setgroup,
+                    'eligibility' => $r->eligibility,
+                    'not_attend_dominant' => $r->not_attend_dominant,
+                    'attend_dominant' => $r->attend_dominant,
+                    'attend_del_dominant' => $r->attend_del_dominant,
+                    'outside' => $r->outside,
+                    'monitored_dominant' => $r->monitored_dominant,
+                    'encoded_approved' => $r->encoded_approved,
+                    'submitted_deworming' => $r->submitted_deworming,
+                    'not_encoded_approved' => $r->not_encoded_approved,
+                    'encoded_under_forcem' => $r->encoded_under_forcem,
+                    'non_compliant' => $r->non_compliant,
+                    'compliant' => $r->compliant,
+                    'remarks_1' => $r->remarks_1,
+                    'remarks_2' => $r->remarks_2,
+                    'remarks_3' => $r->remarks_3,
+                    'remarks_4' => $r->remarks_4,
+                    'client_status' => $r->client_status,
+                    'sex' => $r->sex,
+                    'grade_group' => $r->grade_group,
+                    'ip' => $r->ip,                    
                 ];
                 $counter++;
             }

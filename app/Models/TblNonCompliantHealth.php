@@ -23,7 +23,7 @@ class TblNonCompliantHealth extends Model
     protected $skipColumn = ['id','region', 'province', 'muni', 'brgy','psgc','hh_id','entry_id','lastname','firstname','middlename','ext','birthday','brgy_id','hc_id','dom_hc_id','year','REGION_ID','PROVINCE_ID','CITY_ID','BRGY_ID'];    
     protected $exactQuery = ['id','hh_id','entry_id','ext','birthday','brgy_id','hc_id','dom_hc_id','ext'];
     protected $likeQuery = ['lastname','firstname','middlename','birthday'];
-    protected $otherTablColumn = ['REGION_ID' => 'lib_regions.REGION_ID','PROVINCE_ID' => 'lib_provinces.PROVINCES_ID','CITY_ID' => 'lib_cities.CITY_ID','BRGY_ID' => 'lib_brgy.BRGY_ID'];
+    protected $otherTablColumn = ['REGION_ID' => 'lib_regions.REGION_ID','PROVINCE_ID' => 'lib_provinces.PROVINCE_ID','CITY_ID' => 'lib_cities.CITY_ID','BRGY_ID' => 'lib_brgy.BRGY_ID'];
     
     protected $allowedFilter = [];
     protected $filters;
