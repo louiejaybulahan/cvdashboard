@@ -109,7 +109,7 @@ use Illuminate\Support\Facades\Session;
                         $ae = $sesdata['year']; // Year
                         $af = $sesdata['period']; // Period
                         $ag = date('Y-m-d H:i:s'); // date upload
-                        $ah = $e;
+                        $ah = null;
                         
                         $a = utf8_encode($a);
                         $b = utf8_encode($b);
@@ -171,7 +171,7 @@ use Illuminate\Support\Facades\Session;
                         $ag = $sesdata['year']; // Year
                         $ah = $sesdata['period']; // Period
                         $ai = date('Y-m-d H:i:s'); // date upload
-                        $aj = $e;
+                        $aj = null;
                         
                         $a = utf8_encode($a);
                         $b = utf8_encode($b);
@@ -219,7 +219,7 @@ use Illuminate\Support\Facades\Session;
                         $r = $sesdata['year']; // Year
                         $s = $sesdata['period']; // Period
                         $t = date('Y-m-d H:i:s'); // date upload  
-                        $u = $e;                                              
+                        $u = null;                                              
 
                         $a = utf8_encode($a);
                         $b = utf8_encode($b);

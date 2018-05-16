@@ -11,12 +11,21 @@
 |
 */
 
+
 Route::get('/','SiteController@index');
 
 Auth::routes();
 
 Route::get('/home',function(){ return Redirect::to('site'); });
 
+/*
+Route::get('/', function () {   
+    return view('welcome');
+});
+Route::get('/submit', function () {
+    return view('submit');
+});
+*/
 Route::get('/logout',function(){ return Redirect::to('login'); });
 Route::get('/loguser','Auth\LoginController@loguser')->name('loguser');     
 
@@ -102,9 +111,13 @@ Route::group(['prefix' => 'uploadfilenoncom', 'as' => 'uploadfilenoncom.'], func
     //Route::get('newstorage','SettingsController@newstorage')->name('newstorage');          
 });
 
+
+
 Route::get('profile','SiteController@index')->name('profile');
 
 Route::get('error',function(){ return view('error'); });
 
+
 require_once('web_route1.php');
 require_once('web_route2.php');
+

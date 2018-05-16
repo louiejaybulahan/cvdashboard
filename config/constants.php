@@ -19,6 +19,10 @@ return [
     'path_uploaded_data' => base_path('upload/data'),
     'path_filters_data' => base_path('upload/filters/'),
     'page_limit' => 50,
+	
+	//obtr v1.0 upload path
+	'obtr_path_uploaded' => base_path('upload/obtrfile'),
+	
 
 ];
 

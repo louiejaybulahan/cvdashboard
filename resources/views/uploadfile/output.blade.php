@@ -38,16 +38,8 @@ use Illuminate\Support\Facades\Session;
         </script>
     </head>
 <body>
-@if($sesdata['position']<$sesdata['numberOfFiles'])
-    <div style="position: fixed;  background: yellowgreen; top: 45%; left: 35%; z-index: 100;text-align:center; padding: 10px;">
-        <strong id="divPercentage" style="font-size: 35px;"></strong><br>
-        <span style="font-size: 15px;">Reading Data<br>
-             {{ (intval($sesdata['position'])+1).' out of '. $sesdata['numberOfFiles'].' files uploaded' }}
-        </span>
-    </div>
-@endif   
  @php    
-    \ini_set("memory_limit",-1);
+    \ini_set('memory_limit','-1');
     \ini_set('max_execution_time', 0); 
     if (ob_get_level() == 0) ob_start();
 
@@ -55,7 +47,7 @@ use Illuminate\Support\Facades\Session;
         echo 'Please wait while we extract your excel data!. <br>';
         echo 'Source: '.$path.'<br>';
         echo 'File index : '.(intval($sesdata['position'])+1).'<br>';
-    } 
+    }
     ob_flush();
     flush();
     $i = 2;
@@ -64,11 +56,8 @@ use Illuminate\Support\Facades\Session;
     $listError = [];
     $table = 'tbl_turnout_';
     if(!$isDone){            
-        if(file_exists($path)){                                     
-            $fldValue = 33;
-            for($fld = 0 ; $fld < $fldValue; $fld++ ){ $field[] = '?'; }
-            echo $extention;
-            if($extention=='xlsx'){                
+        if(file_exists($path)){ 
+            if($extention=='.xlsx'){            
                 $objReader = new \PHPExcel_Reader_Excel2007();            
                 $objReader->setReadDataOnly(true);        
                 $spreadsheet = $objReader->load($path);        
@@ -105,43 +94,43 @@ use Illuminate\Support\Facades\Session;
                     $ab = $sheet->getCell('AB'.$index)->getValue(); // client status
                     $ac = $sheet->getCell('AC'.$index)->getValue(); // sex
                     $ad = $sheet->getCell('AD'.$index)->getValue(); // grade group
-                    $ae = $sheet->getCell('AE'.$index)->getValue(); // ip                    
+                    $ae = $sheet->getCell('AE'.$index)->getValue(); // ip
                     $ad = (($ad!='' AND $ad!=null)?$ad:'');
-
+                    
                     $a = utf8_encode($a);
                     $b = utf8_encode($b);
                     $c = utf8_encode($c);
                     $d = utf8_encode($d);
                     $e = utf8_encode($e);
-
-                    $param = [null,$a,$b,$c,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$t,$u,$v,$w,$x,$y,$z,$aa,$ab,$ac,$ad,$ae,$d,$d];
-                    try{                                                    
-                        DB::insert('insert into '.$table.$sesdata['year'].'_'.$sesdata['period'].' values('.implode(',',$field).')',$param);                
-                        echo '[ ' . $index . ' ] - Data successfully inserted!. '.$param[1].' - '.$param[2].' - '.$param[3].' - '.$param[4].'<br>';                                
+                    
+                    $param = [null,$a,$b,$c,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$t,$u,$v,$w,$x,$y,$z,$aa,$ab,$ac,$ad,$ae,$d,null];
+                    try{         
+                        DB::insert('insert into '.$table.$sesdata['year'].'_'.$sesdata['period'].' values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',$param);                
+                        echo '[ ' . $index . ' ] - Data successfully inserted!. '.$a.' - '.$b.' - '.$c.' - '.$e.'<br>';
+                        $success++;
                     }catch(\Illuminate\Database\QueryException $ex){                        
                         $listError[] = $ex->getMessage();
-                        echo '<span style="color:red">[ ' . $index . ' ] (3)- Error on ' . $table. ' :  ' . $ex->getMessage() . '. </span><br>';                                    
-                    }    
-                    $percentage = round( $index / $highestRow * 100, 0 );
-                    echo '<script type="text/javascript">document.getElementById("divPercentage").innerHTML = "'.$percentage.'%"; </script>';
+                        echo '<span style="color:red">[ ' . $index . ' ] (3)- Error on ' . $table.$y.'_'.intval($z) . ' :  ' . $ex->getMessage() . '. </span><br>';
+                        $errors++;
+                    }                
                     ob_flush();
                     flush();
                 }
-            }else{            
+            }else{
+            
                 $file = new SplFileObject($path);
                 $csv = array();               
                 $limit = $sesdata['limit'];  
                 $line  = intval($sesdata['currentRow']);
                 $index = $sesdata['currentRow'];
-                $pIndex = 0;
-                $isEof = false;                     
+                $isEof = false;     
+                
                 try{                
                     while(!$file->eof()){
                         if( $index < ($limit+$line) ){
                             $file->seek($index);                                 
                             $row = str_getcsv($file->current());                        
                             $index++;
-                            $pIndex++;
 
                             $a = $row[0]; // region
                             $b = $row[1]; // province
@@ -182,16 +171,16 @@ use Illuminate\Support\Facades\Session;
                             $d = utf8_encode($d);
                             $e = utf8_encode($e);
                     
-                            $param = [null,$a,$b,$c,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$t,$u,$v,$w,$x,$y,$z,$aa,$ab,$ac,$ad,$ae,$d,$d];
-                            try{                                         
-                                DB::insert('insert into '.$table.$sesdata['year'].'_'.$sesdata['period'].' values('.implode(',',$field).')',$param);                
-                                echo '[ ' . $index . ' ] - Data successfully inserted!. '.$param[1].' - '.$param[2].' - '.$param[3].' - '.$param[4].'<br>';                                        
+                            $param = [null,$a,$b,$c,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$t,$u,$v,$w,$x,$y,$z,$aa,$ab,$ac,$ad,$ae,$d,null];
+                            try{         
+                                DB::insert('insert into '.$table.$sesdata['year'].'_'.$sesdata['period'].' values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',$param);                
+                                echo '[ ' . $index . ' ] - Data successfully inserted!. '.$a.' - '.$b.' - '.$c.' - '.$e.'<br>';
+                                $success++;
                             }catch(\Illuminate\Database\QueryException $ex){                        
                                 $listError[] = $ex->getMessage();
-                                echo '<span style="color:red">[ ' . $index . ' ] (3)- Error on ' . $table. ' :  ' . $ex->getMessage() . '. </span><br>';                                            
-                            }        
-                            $percentage = round( $pIndex / $sesdata['limit'] * 100, 0 );
-                            echo '<script type="text/javascript">document.getElementById("divPercentage").innerHTML = "'.$percentage.'%"; </script>';
+                                echo '<span style="color:red">[ ' . $index . ' ] (3)- Error on ' . $table.$y.'_'.intval($z) . ' :  ' . $ex->getMessage() . '. </span><br>';
+                                $errors++;
+                            }                            
                         }                      
                         if($file->fgets() == false){ $isEof = true; }
                         ob_flush();
@@ -228,12 +217,14 @@ use Illuminate\Support\Facades\Session;
         }        
         if(!$detect){ // no files to read            
             \Session::forget('uploadbasefile');
-            echo '<script type="text/javascript">parent.enabledUploadFile();</script>';             
-        }else{ // if the list file is not done            
+            echo '<script type="text/javascript">parent.enabledUploadFile();</script>'; 
+        }else{ // if the list file is not done
+            //echo '<pre>';
+            //print_r($sesdata);
+            //echo '<pre>';
             \Session::put('uploadbasefile',$sesdata);
             if(!$errors){
-                // echo '<script type="text/javascript">setTimeout(function(){parent.jsRender(); },1000); </script>';                
-                echo '<a href="#click" onclick="parent.jsRender();">Next</a>';
+                echo '<script type="text/javascript">setTimeout(function(){parent.jsRender(); },1000); </script>';
             }else{
                 echo '<a href="#click" onclick="parent.jsRender();">Next</a>';
                 echo '<script type="text/javascript">window.scrollTo(0,document.body.scrollHeight); stopInterval();</script>';
@@ -246,7 +237,7 @@ use Illuminate\Support\Facades\Session;
         echo '<strong>Time Executed: '.$execution_time.'</strong><br>';
         echo '<h3><strong>Successfully Done!</strong></h3>'; 
         echo '<script type="text/javascript">parent.enabledUploadFile();</script>'; 
-        // \Session::forget('uploadbasefile');
+        \Session::forget('uploadbasefile');
     }
  @endphp
  

@@ -26,7 +26,7 @@
 	<!-- START OF HEADER -->
 	<div class="header radius3">
     	<div class="headerinner">        	
-            <a href="" style="text-decoration: none;color:#FFFFFF;font-size:32px;"><!-- img src="./images/starlight_admin_template_logo_small.png" alt="" / --><div style="min-height:36px;">CV Dashboard</div></a>                    
+            <a href="" style="text-decoration: none;color:#FFFFFF;font-size:32px;"><!-- img src="./images/starlight_admin_template_logo_small.png" alt="" / --><div style="min-height:36px;">Pantawid Pamilya Dashboard</div></a>                    
             <div class="headright">
             	<div class="headercolumn">&nbsp;</div>
             	<div id="searchPanel" class="headercolumn">
@@ -70,18 +70,31 @@
 	</div><!--header-->
     <!-- END OF HEADER -->
     
-    <!-- START OF MAIN CONTENT lefticon-->
-    <div class="mainwrapper ">
+    <!-- START OF MAIN CONTENT  mainwrapper lefticon -->
+    <div class="mainwrapper">
      	<div class="mainwrapperinner">         	
 				<div class="mainleft">
 					<div class="mainleftinner">
 					
 						<div class="leftmenu">
-							<ul>
-								<li><a href="{{ route('site.index') }}" class="dashboard"><span>Dashboard</span></a></li>
-                                <li><a href="{{ route('users.index') }}" class="users"><span>Users</span></a></li>								
-                                <li><a href="{{ route('listturnout.index') }}" class="widgets"><span>List</span></a></li>								
-                                <li><a href="{{ route('uploadfile.index') }}" class="widgets"><span>Import Files</span></a></li>                                                            
+							<ul>		
+								<li><a href="{{ route('users.index') }}" class="users"><span>Users</span></a></li>
+								<li>
+									<a href="#" class="dashboard menudrop active"><span>Turn Out</span></a>
+								    <ul style="display: block;">
+										<li><a href="{{ route('site.index') }}" class="dashboard"><span>Dashboard</span></a></li>
+										<li><a href="{{ route('generateturnout.index') }}" class="widgets"><span>Generate Turnout</span></a></li>										
+										<li><a href="{{ route('listturnout.index') }}" class="widgets"><span>List</span></a></li>								
+										<li><a href="{{ route('uploadfile.index') }}" class="widgets"><span>Import Files</span></a></li>										
+									</ul>	
+								</li>
+								
+								<li>
+									<a href="#" class="dashboard  active"><span>OBTR</span></a>
+								   <ul style="display: block;">									
+										<li><a href="{{ route('obtrfileupload.index') }}" class="charts"><span>Accomplishment and Monitoring</span></a></li>
+									</ul>	
+								</li>							
 							</ul>
 								
 						</div><!--leftmenu toggle-->
@@ -92,13 +105,13 @@
 				<div class="maincontent @yield('optLayout')">
 					<div class="maincontentinner">
 							<ul class="maintabmenu">
-                                @if(isset($header) AND is_array($header))  
-                                    @foreach($header as $m)
-                                        <li class="{{ $m['selected'] }}"><a href="{{ $m['url'] }}">{{ $m['title'] }}</a></li>
-                                    @endforeach
-                                @else
-                                    <li class="current"><a href="#">@yield('title') </a></li>
-                                @endif
+                @if(isset($header) AND is_array($header))  
+                    @foreach($header as $m)
+                        <li class="{{ $m['selected'] }}"><a href="{{ $m['url'] }}">{{ $m['title'] }}</a></li>
+                    @endforeach
+                @else
+                    <li class="current"><a href="#">@yield('title') </a></li>
+                @endif
 							</ul><!--maintabmenu-->		
               
 							<div class="content">                              

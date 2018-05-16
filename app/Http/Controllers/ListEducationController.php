@@ -366,11 +366,7 @@ class ListEducationController extends Controller {
             $month[] = $r->{$column};
         }  
         
-        // $pathFilters = \Config::get('constants.path_filters_data');
-        // $f = fopen($pathFilters.'education_'.$year.'_brgy.json','w');
-        // fwrite($f,json_encode($brgy));
-        // fclose($f);
-                       
+        $pathFilters = \Config::get('constants.path_filters_data');                       
         $f = fopen($pathFilters.'education_'.$year.'_shoolname.json','w');
         fwrite($f,json_encode($school_name));
         fclose($f);

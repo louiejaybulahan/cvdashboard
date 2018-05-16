@@ -237,6 +237,7 @@ class ListHealthController extends Controller {
                 
         $column = 'period';
         $period = [];
+        $pathFilters = \Config::get('constants.path_filters_data');
         $result = DB::table($table.$year)->select($column)->groupBy($column)->get();
         foreach($result AS $r){
             $period[] = $r->{$column};

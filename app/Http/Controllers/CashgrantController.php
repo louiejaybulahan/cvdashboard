@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 //use Auth;
+use Illuminate\Http\Request;
 //use Illuminate\Routing\UrlGenerator;
 //use Illuminate\Routing\Redirector;
 //use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\CashGrant;
+
 
 class CashgrantController extends Controller {
 
@@ -26,8 +27,7 @@ class CashgrantController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request) {  
-        // the quick brown fox jump over the lazy dog           
+    public function index(Request $request) {             
         $currentYear = \App\Config::getValue('PERIOD_CURRENT');
         $province = \App\Province::orderBy('name')->get();
         $standard = \App\StandardRemarks::orderBy('remarks')->get();    
