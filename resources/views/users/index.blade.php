@@ -19,7 +19,7 @@
 <script type="text/javascript">
 jQuery(document).ready(function () {
     // jQuery('#frmSubmitForm input[name="id"]').val('hello world');
-    jQuery('.chosen').chosen({width: "95%"});
+    jQuery('.chosen').chosen({width:"80%"});
     jQuery('#dyntable').dataTable({'sPaginationType': 'full_numbers'});
     jQuery('#dyntable_length').prepend('<a href="#addnewUser" id="btnNewAccount" class="stdbtn btn_blue"><span>New Account</span></a> ');
     jQuery('.btnBack').click(function () {
@@ -27,6 +27,7 @@ jQuery(document).ready(function () {
         jQuery('#divList').fadeIn();
     });
     jQuery('#btnNewAccount').click(function(){
+        jQuery('#username').prop('readonly',false);
         $('#divList').hide();
         $('#divAccount').fadeIn();
     });
@@ -34,6 +35,7 @@ jQuery(document).ready(function () {
     jQuery('#btnAccountSave').click(function(){
         jQuery(this).attr('class','btn btn-default');        
         jQuery(this).attr('class','stdbtn btn_blue').prop('disabled',true);
+        jQuery('#frmSubmitForm [name="'+tokenName +'"]').val(jsToken(''));
         var dataString = $('#frmSubmitForm').serialize();
         $('#divListError').fadeOut();
         jQuery.ajax({
@@ -49,7 +51,8 @@ jQuery(document).ready(function () {
                         });
                         $('#divListError').html(strError).fadeIn();
                     }                    
-                }                 
+                }else{ $('#frmSubmitForm').trigger('reset'); location.reload(); }  
+                jsToken(data.token);               
             }
         }).done(function(){
             jQuery('#btnAccountSave').attr('class','stdbtn btn_black').prop('disabled',false);            
@@ -60,20 +63,27 @@ function jsMessage(message) { jQuery.jGrowl(message); return false; }
 function jsEdit(id){
     var dataString = {'_token':'{{ csrf_token() }}', 'id':id};
     jQuery.ajax({
-        type: "POST", url: '', data: dataString, dataType: 'json', cache: false,
+        type: "POST", url: "{{ route('users.edit') }}", data: dataString, dataType: 'json', cache: false,
         error: function (request, status, error) { jsMessage('Error Request'); },
         success: function (data) {
             if (data.flag == 1){
-            var usr = data.msg;
-                    jQuery('#btnNew').trigger('click');
-                    jQuery('#userid').val(usr.id);
-                    jQuery('#oldusername').val(usr.username);
-                    jQuery('#username').val(usr.username);
-                    jQuery('#lname').val(usr.lname);
-                    jQuery('#fname').val(usr.fname);
-                    jQuery('#mname').val(usr.mname);
+                var usr = data.info;
+                jQuery('#btnNew').trigger('click');
+                jQuery('#id').val(usr.id);
+                jQuery('#username').prop('readonly',true).val(usr.username);                
+                jQuery('#userlevel').val(usr.userlevel);
+                jQuery('#region').val(usr.region);
+                jQuery('#firstname').val(usr.firstname);
+                jQuery('#lastname').val(usr.lastname);
+                jQuery('#email').val(usr.email);
+                jQuery('#contact').val(usr.contact);   
+                jQuery('#divList').hide();
+                jQuery('#divAccount').fadeIn();
+                jQuery('#region').trigger("chosen:updated");
+                jQuery("#userlevel").trigger("chosen:updated");
             } 
             else{ jsMessage('Error Request. Invalid Username'); }
+            jsToken(data.token);  
         }
     });
     return false;
@@ -85,7 +95,8 @@ function jsDelete(id){
             error: function (request, status, error) { jsMessage('Error Request'); },
             success: function (data) {
                 jsMessage(data.msg);
-                if (data.flag == 1){ jQuery('#row_' + id).remove(); }                
+                if (data.flag == 1){ jQuery('#row_' + data.id).remove(); } 
+                jsToken(data.token);                 
             }
     });
     return false;
@@ -105,43 +116,54 @@ function jsDelete(id){
             <col class="con1" />
             <col class="con0" />
             <col class="con1" />
+            <col class="con0" />
+            <col class="con1" />
+            <col class="con0" />
         </colgroup>
         <thead>
             <tr>
                 <th class="head1" width="10">#</th>               
+                <th class="head0">Region</th>
+                <th class="head1">User Level</th>
                 <th class="head0">Username</th>
                 <th class="head1">Lastname</th>
                 <th class="head0">Firstname</th>
-                <th class="head1">Middlename</th>
-                <th class="head0">Status</th>
-                <th class="head1" width="200">Option</th>
+                <th class="head1">Contact</th>
+                <th class="head0">Email</th>
+                <th class="head1">Status</th>
+                <th class="head0">Option</th>
             </tr>
         </thead>
         <tfoot>
             <tr>
                 <th class="head1">#</th>                
+                <th class="head0">Region</th>
+                <th class="head1">User Level</th>
                 <th class="head0">Username</th>
                 <th class="head1">Lastname</th>
                 <th class="head0">Firstname</th>
-                <th class="head1">Middlename</th>
-                <th class="head0">Status</th>
-                <th class="head1">Option</th>
+                <th class="head1">Contact</th>
+                <th class="head0">Email</th>                
+                <th class="head1">Status</th>
+                <th class="head0">Option</th>
             </tr>
         </tfoot>
         <tbody>
             @php ($i=1)
             @foreach($users as $r)            
-            <tr id="row_{{ $r->id }}">
+            <tr id="row_{{ $r->user_id }}">
                 <td>{{ $i }}</td>
+                <td>{{ $r->REGION_NAME }}</td>
+                <td>{{ $r->level_name }}</td>                
                 <td>{{ $r->username }}</td>
                 <td>{{ $r->lastname }}</td>
                 <td>{{ $r->firstname }}</td>
-                <td>{{ $r->middlename }}</td>
+                <td>{{ $r->contact }}</td>
+                <td>{{ $r->email }}</td>
                 <td>{{ $r->status ? 'Active' : 'Block' }}</td>
                 <td>
-                    <a href="#Edit-{{ $r->id }}" onclick="jsEdit('{{ $r->id }}');">ModifyAccount</a> | 
-                    <a href="#Permission-{{ $r->id }}" onclick="jsPermission('{{ $r->id }}','{{ $r->username }}','{{ $r->status }}');">Permission</a> | 
-                    <a href="#Delete-{{ $r->id }}" onclick="jsDelete('{{ $r->id }}');">Delete</a></td>
+                    <a href="#Edit-{{ $r->user_id }}" onclick="jsEdit('{{ $r->user_id }}');">ModifyAccount</a> |                     
+                    <a href="#Delete-{{ $r->user_id }}" onclick="jsDelete('{{ $r->user_id }}');">Delete</a></td>
                 @php ($i++)
             </tr>
             @endforeach
@@ -224,7 +246,7 @@ function jsDelete(id){
         <br>                        
         <p class="stdformbutton">
             <button class="stdbtn btnBack">Back</button>&nbsp;
-            <button class="submit radius2" id="btnAccountSave">Save New Account</button>
+            <button class="submit radius2" id="btnAccountSave">Save Account</button>
         </p>
     {{ Form::close() }}    
 </div>

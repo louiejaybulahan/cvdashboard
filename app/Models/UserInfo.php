@@ -55,10 +55,9 @@ class UserInfo extends Authenticatable
                 ]); 
             break;
             case 'update':
-                $validate = Validator::make($request->all(), [
-                    'username' => 'required|unique:'.$this->getTable().',username,'.$request->user_id.'|max:100',
+                $validate = Validator::make($request->all(), [ 
                     'password' => 'required|min:6|max:45',
-                    'retype' => 'required|min:6|max:45|same:password',
+                    'retype' => 'required|min:6|max:45|same:password',                                                       
                     'firstname' => 'required|max:45',
                     'lastname' => 'required|max:45',
                     'email' => 'required|email|max:45',
@@ -83,7 +82,11 @@ class UserInfo extends Authenticatable
     }
     
     public function getUserList(){
-        return $this->select('user_infos.*')->orderBy('user_infos.lastname')->get();        
+        return $this->select('user_infos.*','lib_regions.REGION_NAME','user_level.level_name')
+        ->leftJoin('lib_regions', 'lib_regions.REGION_ID', '=', 'user_infos.REGION_ID')
+        ->leftJoin('user_level', 'user_level.level_id', '=', 'user_infos.level_id')
+        ->orderBy('user_infos.lastname')
+        ->get();        
     }
     public function getAuthPassword()
     {  return $this->password; }

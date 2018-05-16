@@ -45,10 +45,10 @@ Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
     Route::post('save','UsersController@save')->name('save');    
     //Route::post('list','UsersController@list')->name('list');    
     Route::post('edit','UsersController@edit')->name('edit');        
-    Route::post('permission','UsersController@permission')->name('permission');
-    Route::post('municipal','UsersController@municipal')->name('municipal');
+    //Route::post('permission','UsersController@permission')->name('permission');
+    //Route::post('municipal','UsersController@municipal')->name('municipal');
     Route::post('remove','UsersController@remove')->name('remove');    
-    Route::post('savepermission','UsersController@savepermission')->name('savepermission');
+    //Route::post('savepermission','UsersController@savepermission')->name('savepermission');
 });
 
 Route::group(['prefix' => 'listeducation', 'as' => 'listeducation.'], function () {

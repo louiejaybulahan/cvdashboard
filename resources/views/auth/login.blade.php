@@ -25,7 +25,10 @@
     <p>
         <button class="radius3 bebas" type="submit">Sign in</button>                            
     </p>                        
-    <p><a href="{{ route('password.request') }}" class="whitelink small">Can't access your account?</a></p>                                         
+    <p>
+        <!-- a href="{{ route('password.request') }}" class="whitelink small">Can't access your account?</a -->
+        <a href="{{ route('site.index') }}" class="whitelink small">Back to main page</a>
+    </p>
 </form>
 
 @endsection

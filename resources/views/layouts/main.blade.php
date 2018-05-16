@@ -53,15 +53,29 @@
                 <div id="userPanel" class="headercolumn">
                     <a href="" class="userinfo radius2">
                         <img src="./images/avatar.png" alt="" class="radius2" />
-                        <span><strong>{{ Auth::user()->fname.' '.Auth::user()->lname }}</strong></span>
+                        <span>
+                            <strong>
+                                @if(Auth::check())
+                                    {{ Auth::user()->fname.' '.Auth::user()->lname }}
+                                @else 
+                                    Guest
+                                @endif
+                            </strong>
+                        </span>
                     </a>
                     <div class="userdrop">
                         <ul>
                             <!-- li><a href="">Profile</a></li>
                             <li><a href="">Account Settings</a></li -->
-                            <li><a href="{{ url('logout') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Logout</a></li> 
+                            @if(Auth::check())
+                                <li><a href="{{ url('logout') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Logout</a></li> 
+                            @else
+                                <li><a href="{{ url('login') }}">Login</a></li>     
+                            @endif
                         </ul>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">{{ csrf_field() }}</form>
+                        @if(Auth::check())
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">{{ csrf_field() }}</form>
+                        @endif
                     </div><!--userdrop-->
                 </div><!--headercolumn-->
             </div><!--headright-->
@@ -77,15 +91,19 @@
 					<div class="mainleftinner">
 					
 						<div class="leftmenu">
-							<ul>		
-								<li><a href="{{ route('users.index') }}" class="users"><span>Users</span></a></li>
+							<ul>	
+                                @if(Auth::check())
+                                    <li><a href="{{ route('users.index') }}" class="users"><span>Users</span></a></li>
+                                @endif
 								<li>
 									<a href="#" class="dashboard menudrop active"><span>Turn Out</span></a>
 								    <ul style="display: block;">
-										<li><a href="{{ route('site.index') }}" class="dashboard"><span>Dashboard</span></a></li>
-										<li><a href="{{ route('generateturnout.index') }}" class="widgets"><span>Generate Turnout</span></a></li>										
-										<li><a href="{{ route('listturnout.index') }}" class="widgets"><span>List</span></a></li>								
-										<li><a href="{{ route('uploadfile.index') }}" class="widgets"><span>Import Files</span></a></li>										
+                                            <li><a href="{{ route('site.index') }}" class="dashboard"><span>Dashboard</span></a></li>
+                                        @if(Auth::check())										
+                                            <li><a href="{{ route('generateturnout.index') }}" class="widgets"><span>Generate Turnout</span></a></li>										
+                                            <li><a href="{{ route('listturnout.index') }}" class="widgets"><span>List</span></a></li>								
+                                            <li><a href="{{ route('uploadfile.index') }}" class="widgets"><span>Import Files</span></a></li>										
+                                        @endif
 									</ul>	
 								</li>
 								
@@ -105,13 +123,13 @@
 				<div class="maincontent @yield('optLayout')">
 					<div class="maincontentinner">
 							<ul class="maintabmenu">
-                @if(isset($header) AND is_array($header))  
-                    @foreach($header as $m)
-                        <li class="{{ $m['selected'] }}"><a href="{{ $m['url'] }}">{{ $m['title'] }}</a></li>
-                    @endforeach
-                @else
-                    <li class="current"><a href="#">@yield('title') </a></li>
-                @endif
+                                @if(isset($header) AND is_array($header))  
+                                    @foreach($header as $m)
+                                        <li class="{{ $m['selected'] }}"><a href="{{ $m['url'] }}">{{ $m['title'] }}</a></li>
+                                    @endforeach
+                                @else
+                                    <li class="current"><a href="#">@yield('title') </a></li>
+                                @endif
 							</ul><!--maintabmenu-->		
               
 							<div class="content">                              
