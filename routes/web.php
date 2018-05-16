@@ -41,14 +41,14 @@ Route::group(['prefix' => 'site', 'as' => 'site.'], function () {
 
 Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
     Route::get('/','UsersController@index')->name('index');    
-    Route::get('register','UserController@register')->name('register');    
-    Route::post('save','UserController@save')->name('save');    
-    //Route::post('list','UserController@list')->name('list');    
-    Route::post('edit','UserController@edit')->name('edit');        
-    Route::post('permission','UserController@permission')->name('permission');
-    Route::post('municipal','UserController@municipal')->name('municipal');
-    Route::post('remove','UserController@remove')->name('remove');    
-    Route::post('savepermission','UserController@savepermission')->name('savepermission');
+    Route::get('register','UsersController@register')->name('register');    
+    Route::post('save','UsersController@save')->name('save');    
+    //Route::post('list','UsersController@list')->name('list');    
+    Route::post('edit','UsersController@edit')->name('edit');        
+    Route::post('permission','UsersController@permission')->name('permission');
+    Route::post('municipal','UsersController@municipal')->name('municipal');
+    Route::post('remove','UsersController@remove')->name('remove');    
+    Route::post('savepermission','UsersController@savepermission')->name('savepermission');
 });
 
 Route::group(['prefix' => 'listeducation', 'as' => 'listeducation.'], function () {

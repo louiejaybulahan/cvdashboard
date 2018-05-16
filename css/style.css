@@ -483,7 +483,7 @@ button,input,select,textarea { font-size: 12px; font-family: Arial, Helvetica, s
 	background: #fff; -moz-box-shadow: inset 1px 1px 2px #eee; -webkit-box-shadow: inset 1px 1px 2px #eee; box-shadow: inset 1px 1px 2px #eee; 
 }
 
-.stdform button { border: 1px solid #333;  color: #fff; cursor: pointer; padding: 7px 10px; font-weight: bold; }
+.stdform button { border: 1px solid #ccc; background: #f1f1f1; color: #100f0f; cursor: pointer; padding: 7px 10px; font-weight: bold; }
 .stdform button:hover { background: #111; border: 1px solid #000; color: #fff; }
 .stdform button.cancel { background: #eee; color: #666; border: 1px solid #ddd; }
 .stdform button.cancel:hover { background: #ddd; border: 1px solid #ccc; }

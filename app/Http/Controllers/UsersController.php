@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 //use Auth;
-//use Illuminate\Http\Request;
+use Illuminate\Http\Request;
 //use Illuminate\Routing\UrlGenerator;
 //use Illuminate\Routing\Redirector;
 //use Illuminate\Support\Facades\Auth;
-//use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Hash;
 //use Illuminate\Support\Facades\DB;
 use App\Models\UserInfo;
 //use App\Models\Roles;
@@ -30,37 +30,44 @@ class UsersController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {                            
-        $user = new UserInfo();          
+        $user = new UserInfo();        
+        $region = \App\Models\LibRegions::all();        
+        $userlevel = \App\Models\UserLevel::orderBy('level_name','asc')->get();        
         return view('users.index', [
             'users' => $user->getUserList(),
-            'permission' => null, //\App\Models\Permission::all(),
-            'provinces' => null, //\App\Models\Province::all()
+            'userlevel' => $userlevel,
+            'region' => $region,
         ]);
     }
-    /*
+    
     public function save(Request $request) {
-        $status = '';
+        $status = '';        
         if($request->id!=''){            
-            $areaAssign = new \App\AreaAsign();
-            $areaAssign->where('username',$request->oldusername)->update(['username' => $request->username]);
-            $roles = \App\Roles::where('username',$request->oldusername)->update(['username' => $request->username]);
-            $user = UserInfo::find($request->id);
-            $status = 'update';
+            // $areaAssign = new \App\AreaAsign();
+            // $areaAssign->where('username',$request->oldusername)->update(['username' => $request->username]);
+            // $roles = \App\Roles::where('username',$request->oldusername)->update(['username' => $request->username]);
+            // $user = UserInfo::find($request->id);
+            // $status = 'update';
         }else{
-            $user = new UserInfo;           
-            $user->status = 1;
-            $status = 'new';
+            $user = new UserInfo;
+            $user->is_status = 1;
+            $status = 'new';            
         }    
         if ($user->validateuserInfo($request)) {       
             $user->username = $request->username;
             $user->password = Hash::make($request->password);
-            $user->lname = $request->lname;
-            $user->fname = $request->fname;
-            $user->mname = $request->mname;            
+            $user->lastname = $request->lastname;
+            $user->firstname = $request->firstname;
+            $user->middlename = '';
+            $user->email = $request->email;
+            $user->access = '';
+            $user->contact = $request->contact;
+            $user->REGION_ID = $request->region;
+            $user->level_id = $request->userlevel;            
             $user->save();
             return response()->json(['flag' => 1,'msg' => 'Successfully Save']);
-        } else return response()->json(['flag' => 0,'status' => $status, 'msg' => $user->getErrorMessage()]);                
-    }    
+        } else return response()->json(['flag' => 0,'status' => $status, 'msg' => 'Invalid Saving!. Pls. fill-up the form correctly',  'errorlist' => $user->getErrorMessage()]);                
+    }        
     public function remove(Request $request){ 
         $flag = 0;
         if(isset($request->id)){
@@ -71,7 +78,7 @@ class UsersController extends Controller {
         }else{ $msg = 'Invalid ID'; }                
         return response()->json(['flag' => $flag,'msg' => $msg]);
     }
-
+/*
     public function edit(Request $request){
         $flag = 0;
         if(isset($request->id)){

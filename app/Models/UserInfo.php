@@ -36,19 +36,41 @@ class UserInfo extends Authenticatable
         'password', 'remember_token',
     ];
     
-    public function validateuserInfo($request){
-        $validate = Validator::make($request->all(), [
-                    'username' => 'required|unique:'.$this->getTable().',username,'.$request->id.'|max:100',
+    public function validateuserInfo($request,$validationOption = 'new'){                      
+        switch($validationOption){
+            case 'new':
+                $validate = Validator::make($request->all(), [
+                    'username' => 'required|unique:'.$this->getTable().',username|max:100',
                     'password' => 'required|min:6|max:45',
                     'retype' => 'required|min:6|max:45|same:password',
-                    'fname' => 'required|max:45',
-                    'lname' => 'required|max:45',
-                    'mname' => 'required|max:45',
-        ],[
-            'fname.required' => ' The firstname field is required',
-            'lastname.required' => ' The lastname field is required',
-            'middlename.required' => ' The middlename field is required',
-        ]); 
+                    'firstname' => 'required|max:45',
+                    'lastname' => 'required|max:45',
+                    'email' => 'required|email|max:45',
+                    'contact' => 'required|max:45',
+                    'userlevel' => 'required|numeric',
+                    'region' => 'required|numeric',
+                ],[
+                    'firstname.required' => ' The firstname field is required',
+                    'lastname.required' => ' The lastname field is required',                
+                ]); 
+            break;
+            case 'update':
+                $validate = Validator::make($request->all(), [
+                    'username' => 'required|unique:'.$this->getTable().',username,'.$request->user_id.'|max:100',
+                    'password' => 'required|min:6|max:45',
+                    'retype' => 'required|min:6|max:45|same:password',
+                    'firstname' => 'required|max:45',
+                    'lastname' => 'required|max:45',
+                    'email' => 'required|email|max:45',
+                    'contact' => 'required|max:45',
+                    'userlevel' => 'required|numeric',
+                    'region' => 'required|numeric',
+                ],[
+                    'firstname.required' => ' The firstname field is required',
+                    'lastname.required' => ' The lastname field is required',                
+                ]);             
+            break;
+        }                                    
         if (!$validate->fails()) {
             return true;
         }else{

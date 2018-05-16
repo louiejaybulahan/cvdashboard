@@ -17,91 +17,71 @@
 <script type="text/javascript" src="{{ asset('js/chosen/init.js') }}"></script>
 
 <script type="text/javascript">
-/*
 jQuery(document).ready(function () {
-    jQuery('#dyntable').dataTable({
-        'sPaginationType': 'full_numbers'
-    });
-    jQuery('#dyntable_length').prepend('<button class="stdbtn btn_blue" id="btnNew">+ New User</button> ');
+    // jQuery('#frmSubmitForm input[name="id"]').val('hello world');
+    jQuery('.chosen').chosen({width: "95%"});
+    jQuery('#dyntable').dataTable({'sPaginationType': 'full_numbers'});
+    jQuery('#dyntable_length').prepend('<a href="#addnewUser" id="btnNewAccount" class="stdbtn btn_blue"><span>New Account</span></a> ');
     jQuery('.btnBack').click(function () {
-        jQuery('#divForm').hide();
-        jQuery('#divPermission').hide();
+        jQuery('#divAccount').hide();        
         jQuery('#divList').fadeIn();
     });
-    jQuery('#btnNew').click(function () {
-        jQuery('#divList').hide();
-        jQuery('#divForm').fadeIn();        
-        jQuery("#id,#userid,#lname,#fname,#mname,#password,#retype,#username,#oldusername").val('');
+    jQuery('#btnNewAccount').click(function(){
+        $('#divList').hide();
+        $('#divAccount').fadeIn();
     });
-    jQuery('#btnSubmitForm').click(function () {
-        var message = '#divUserMessage';
-        var form = '#formUser';
+
+    jQuery('#btnAccountSave').click(function(){
+        jQuery(this).attr('class','btn btn-default');        
+        jQuery(this).attr('class','stdbtn btn_blue').prop('disabled',true);
+        var dataString = $('#frmSubmitForm').serialize();
+        $('#divListError').fadeOut();
         jQuery.ajax({
-            type: "POST", url: jQuery(form).attr('action'), data: jQuery(form).serialize(), dataType: 'json', cache: false,
+            type: "POST", url: "{{ route('users.save') }}", data: dataString, dataType: 'json', cache: false,
             error: function (request, status, error) { jsMessage('Error Request'); },
             success: function (data) {
-                if (data.flag == 1){
-                    jsMessage(data.msg);
-                    window.setTimeout(location.reload(), 10000);
-                }
-                else{
-                    var errorMessage = '';
-                    if (data.msg != '' && jQuery.isEmptyObject(data.msg) == false) { jQuery.each(data.msg, function(key, val){ errorMessage += ' * ' + val + ', '; }); }
-                    jQuery(message).html('<a class="close"></a><p>' + errorMessage + '</p>').fadeIn();
-                }
-            }
-        });    
-    });
-    jQuery('.chosen,#municipal').chosen({width: "95%"});
-    jQuery('#province').change(function(){
-        var tmpMunicipal = new Array();  
-        var select = '#municipal';
-        var dataString = {'_token':'{{ csrf_token() }}', 'id':jQuery(this).val()};
-        jQuery.ajax({
-            type: "POST", url:' route('users.municipal') ', data: dataString, dataType: 'json', cache: false,
-            error: function (request, status, error) { jsMessage('Error Request'); },
-            success: function (data) {
-                tmpMunicipal = $(select).val();                                
-                $(select+' option').remove();                
-                if (data.list != '' && jQuery.isEmptyObject(data.list) == false) { 
-                    jQuery.each(data.list, function(key, val){                         
-                        $(select).append('<option value="'+val.prov_id+'-'+val.mun_id+'">'+val.name+'</option>');
-                    }); 
-                    if(tmpMunicipal!=null){                                                
-                        $(select).val(tmpMunicipal);
+                jQuery.jGrowl(data.msg);               
+                if (data.flag == 0){                                           
+                    if(data.errorlist!='' && jQuery.isEmptyObject(data.errorlist)==false){ 
+                        var strError = '';
+                        jQuery.each(data.errorlist,function(key,val){
+                           strError += '* '+val+'<br>';
+                        });
+                        $('#divListError').html(strError).fadeIn();
                     }                    
-                }
-                $(select).trigger('chosen:updated');
+                }                 
             }
-        });   
-    });    
+        }).done(function(){
+            jQuery('#btnAccountSave').attr('class','stdbtn btn_black').prop('disabled',false);            
+        });
+    });
 });
 function jsMessage(message) { jQuery.jGrowl(message); return false; }
 function jsEdit(id){
     var dataString = {'_token':'{{ csrf_token() }}', 'id':id};
     jQuery.ajax({
-    type: "POST", url: 'route('users.edit') ', data: dataString, dataType: 'json', cache: false,
-            error: function (request, status, error) { jsMessage('Error Request'); },
-            success: function (data) {
-                if (data.flag == 1){
-                var usr = data.msg;
-                        jQuery('#btnNew').trigger('click');
-                        jQuery('#userid').val(usr.id);
-                        jQuery('#oldusername').val(usr.username);
-                        jQuery('#username').val(usr.username);
-                        jQuery('#lname').val(usr.lname);
-                        jQuery('#fname').val(usr.fname);
-                        jQuery('#mname').val(usr.mname);
-                } 
-                else{ jsMessage('Error Request. Invalid Username'); }
-            }
+        type: "POST", url: '', data: dataString, dataType: 'json', cache: false,
+        error: function (request, status, error) { jsMessage('Error Request'); },
+        success: function (data) {
+            if (data.flag == 1){
+            var usr = data.msg;
+                    jQuery('#btnNew').trigger('click');
+                    jQuery('#userid').val(usr.id);
+                    jQuery('#oldusername').val(usr.username);
+                    jQuery('#username').val(usr.username);
+                    jQuery('#lname').val(usr.lname);
+                    jQuery('#fname').val(usr.fname);
+                    jQuery('#mname').val(usr.mname);
+            } 
+            else{ jsMessage('Error Request. Invalid Username'); }
+        }
     });
     return false;
 }
 function jsDelete(id){
     var dataString = {'_token':'{{ csrf_token() }}', 'id':id};
     jQuery.ajax({
-    type: "POST", url: 'route('users.remove')', data: dataString, dataType: 'json', cache: false,
+    type: "POST", url: "{{ route('users.remove') }}", data: dataString, dataType: 'json', cache: false,
             error: function (request, status, error) { jsMessage('Error Request'); },
             success: function (data) {
                 jsMessage(data.msg);
@@ -110,56 +90,6 @@ function jsDelete(id){
     });
     return false;
 }
-function jsPermission(id,username,stat){
-    var dataString = {'_token':'{{ csrf_token() }}', 'id':id,'username':username,};
-    jQuery('#divList').hide();
-    jQuery('#divPermission').fadeIn();
-    jQuery.ajax({
-    type: "POST", url: ' route('users.permission') ', data: dataString, dataType: 'json', cache: false,
-            error: function (request, status, error) { jsMessage('Error Request'); },
-            success: function (data) {   
-                jQuery('#permissionUsername').val(username);
-                jQuery('#permissionId').val(id);
-                jQuery('input[name=user_status][value='+stat+']').prop('checked', 'checked');
-                if (data.flag == 1){                                        
-                    jQuery('input[name=permission][value='+data.roles.permission+']').prop('checked', 'checked');
-                }
-                jQuery('#province').val(data.listProvince);
-                jQuery('#province').trigger('chosen:updated').trigger('change');
-                var tmpMunicipal = new Array();
-                if (data.area != '' && jQuery.isEmptyObject(data.area) == false) { 
-                    jQuery.each(data.area, function(key, val){
-                        tmpMunicipal.push(val.province+'-'+val.mun);
-                    });
-                }
-                jQuery('#municipal option').remove();
-                if (data.municipal != '' && jQuery.isEmptyObject(data.municipal) == false) {
-                    jQuery.each(data.municipal, function(key, val){
-                        $('#municipal').append('<option value="'+val.prov_id+'-'+val.mun_id+'">'+val.name+'</option>');
-                    }); 
-                    if(tmpMunicipal!=null){
-                        $('#municipal').val(tmpMunicipal);
-                    }
-                }
-                $('#municipal').trigger('chosen:updated');
-            }
-    });
-    return false;
-}
-function savePermissions(){       
-    jQuery.ajax({
-        type: "POST", url: 'route('users.savepermission') ', data: jQuery('#formPermission').serialize(), dataType: 'json', cache: false,
-        error: function (request, status, error) { jsMessage('Error Request'); },
-        success: function (data) {
-            if (data.flag == 1){  
-                jsMessage('Successfully Save'); 
-            } else{ jsMessage('Error Request. Invalid Username'); } 
-        }
-    });
-    return false;    
-}
-*/
-
 </script>
 @endsection
 
@@ -218,7 +148,86 @@ function savePermissions(){
         </tbody>
     </table>
 </div>
-
+<div id="divAccount" style="display:none;">       
+    <div id="divListError" style="color:red;display:none;"></div> <br>
+    <div>
+    {{ Form::open(['route' => 'users.save','class' => 'stdform','id' => 'frmSubmitForm','novalidate' => 'novalidate','onsubmit' => 'return false;']) }}     
+        <input type="hidden" id="id" name="id" value="">
+        <div class="contenttitle">
+            <h2 class="button"><span>Login Information</span></h2>
+        </div>
+        <br>
+        <p>
+            <label>Username</label>
+            <span class="field"><input type="text" name="username" id="username" class="longinput"><small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small></span>
+            
+        </p> 
+        <p>
+            <label>Password</label>
+            <span class="field"><input type="password" name="password" id="password" class="longinput"><small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small></span>
+            
+        </p> 
+        <p>
+            <label>Confirm Password</label>
+            <span class="field"><input type="password" name="retype" id="retype" class="longinput"><small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small></span>
+            
+        </p> 
+        <div class="contenttitle">
+            <h2 class="button"><span>Access Level</span></h2>
+        </div><br>
+        <p>
+            <label>User level</label>
+            <span class="field">
+                <select name="userlevel" id="userlevel" class="chosen">
+                    <option value="">Choose One</option>
+                    @foreach($userlevel AS $r )
+                        <option value="{{ $r->level_id }}">{{ $r->level_name }}</option>
+                    @endforeach
+                </select>
+                <small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small>
+            </span>
+        </p>   
+        <p>
+            <label>Access Level Location</label>
+            <span class="field">
+                <select name="region" id="region" class="chosen">
+                    <option value="">Choose One</option>                  
+                    @foreach($region AS $r )
+                        <option value="{{ $r->REGION_ID }}">{{ $r->REGION_NAME }}</option>
+                    @endforeach
+                </select>
+                <small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small>
+            </span>
+        </p>   
+                
+        <div class="contenttitle">
+            <h2 class="button"><span>User Information</span></h2>
+        </div>
+        <br>
+        <p>
+            <label>First Name</label>
+            <span class="field"><input type="text" name="firstname" id="firstname" class="longinput"><small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small></span>
+            
+        </p>                        
+        <p>
+            <label>Last Name</label>
+            <span class="field"><input type="text" name="lastname" id="lastname" class="longinput"><small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small></span>
+        </p>                        
+        <p>
+            <label>Email</label>
+            <span class="field"><input type="text" name="email" id="email" class="longinput"><small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small></span>
+        </p>
+        <p>
+            <label>Contact</label>
+            <span class="field"><input type="text" name="contact" id="contact" class="longinput"><small class="desc" style="margin:0px;padding-bottom:10px;">Require field</small></span>
+        </p>                     
+        <br>                        
+        <p class="stdformbutton">
+            <button class="stdbtn btnBack">Back</button>&nbsp;
+            <button class="submit radius2" id="btnAccountSave">Save New Account</button>
+        </p>
+    {{ Form::close() }}    
+</div>
 
 <br clear="all">
 
