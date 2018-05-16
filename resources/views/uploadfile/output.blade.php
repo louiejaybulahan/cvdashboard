@@ -232,8 +232,8 @@ use Illuminate\Support\Facades\Session;
         }else{ // if the list file is not done            
             \Session::put('uploadbasefile',$sesdata);
             if(!$errors){
-                // echo '<script type="text/javascript">setTimeout(function(){parent.jsRender(); },1000); </script>';                
-                echo '<a href="#click" onclick="parent.jsRender();">Next</a>';
+                echo '<script type="text/javascript">setTimeout(function(){parent.jsRender(); },1000); </script>';                
+                // echo '<a href="#click" onclick="parent.jsRender();">Next</a>';
             }else{
                 echo '<a href="#click" onclick="parent.jsRender();">Next</a>';
                 echo '<script type="text/javascript">window.scrollTo(0,document.body.scrollHeight); stopInterval();</script>';
