@@ -105,12 +105,18 @@ Route::group(['prefix' => 'uploadfilenoncom', 'as' => 'uploadfilenoncom.'], func
     Route::get('/','UploadfilenoncomController@index')->name('index');    
     Route::post('/','UploadfilenoncomController@index')->name('index');    
     Route::post('loadfile','UploadfilenoncomController@loadfile')->name('loadfile');
-    Route::get('renderfile','UploadfilenoncomController@renderfile')->name('renderfile');
-    //Route::post('save','SettingsController@save')->name('save');
-    //Route::post('rebuildfilter','SettingsController@rebuildfilter')->name('rebuildfilter');
-    //Route::get('newstorage','SettingsController@newstorage')->name('newstorage');          
+    Route::get('renderfile','UploadfilenoncomController@renderfile')->name('renderfile');    
 });
 
+
+Route::group(['prefix' => 'backgroundprocess', 'as' => 'backgroundprocess.'], function () {   
+    
+    Route::get('/','BackgroundprocessController@index')->name('index');          
+    Route::post('addscript','BackgroundprocessController@addscript')->name('addscript');  
+    Route::post('loadscript','BackgroundprocessController@loadscript')->name('loadscript');  
+    Route::post('remove','BackgroundprocessController@remove')->name('remove');  
+    Route::post('readnextcript','BackgroundprocessController@readnextcript')->name('readnextcript');  
+});
 
 
 Route::get('profile','SiteController@index')->name('profile');
