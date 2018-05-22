@@ -31,13 +31,18 @@ class Processlist extends Model
             case 'new':
                 $validate = Validator::make($request->all(), [                                      
                     'scriptname' => 'required|max:45',
-                    'url' => 'required|max:100',                    
+                    'url' => 'required|max:100',    
+                    'run_in' => 'required|max:10',    
+                    'time' => 'required|max:2',    
+
                 ]); 
             break;
             case 'update':
                 $validate = Validator::make($request->all(), [                                      
                     'scriptname' => 'required|max:45',
-                    'url' => 'required|max:100',                    
+                    'url' => 'required|max:100',    
+                    'run_in' => 'required|max:10',    
+                    'time' => 'required|max:2',            
                 ]);        
             break;
         }                                    

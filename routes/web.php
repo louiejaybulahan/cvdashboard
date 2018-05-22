@@ -109,12 +109,13 @@ Route::group(['prefix' => 'uploadfilenoncom', 'as' => 'uploadfilenoncom.'], func
 });
 
 
-Route::group(['prefix' => 'backgroundprocess', 'as' => 'backgroundprocess.'], function () {   
-    
+Route::group(['prefix' => 'backgroundprocess', 'as' => 'backgroundprocess.'], function () {       
     Route::get('/','BackgroundprocessController@index')->name('index');          
+    Route::get('checkscript','BackgroundprocessController@checkscript')->name('checkscript');      
     Route::post('addscript','BackgroundprocessController@addscript')->name('addscript');  
-    Route::post('loadscript','BackgroundprocessController@loadscript')->name('loadscript');  
-    Route::post('remove','BackgroundprocessController@remove')->name('remove');  
+    Route::post('remove','BackgroundprocessController@remove')->name('remove');      
+
+    Route::post('loadscript','BackgroundprocessController@loadscript')->name('loadscript');      
     Route::post('readnextcript','BackgroundprocessController@readnextcript')->name('readnextcript');  
 });
 

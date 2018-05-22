@@ -32,6 +32,7 @@ php artisan tinker
 composer dump-autoload
  php artisan clear-compiled  
  php artisan optimize
+ php artisan config:cache
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 # installing extension forms and html on laravel //https://laravelcollective.com/docs/5.4/html

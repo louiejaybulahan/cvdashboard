@@ -1,9 +1,9 @@
 @extends('layouts.main',[
     'header' => [
         ['url' => '#','title' => 'List of Turnout','selected' => 'current'],
-        ['url' => route('listeducation.index'),'title' => 'List of Non Compliant of Education','selected' => ''],
-        ['url' => route('listhealth.index'),'title'  => 'List of Non Compliant of Health','selected' => ''],
-        ['url' => route('listfds.index'),'title'  => 'List of Non Compliant of FDS','selected' => '']
+        // ['url' => route('listeducation.index'),'title' => 'List of Non Compliant of Education','selected' => ''],
+        // ['url' => route('listhealth.index'),'title'  => 'List of Non Compliant of Health','selected' => ''],
+        // ['url' => route('listfds.index'),'title'  => 'List of Non Compliant of FDS','selected' => '']
     ]
 ])
 

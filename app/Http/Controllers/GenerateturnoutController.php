@@ -34,21 +34,7 @@ class GenerateturnoutController extends Controller {
         $year = $request->input('year');
         $period = $request->input('period');
         $region = $request->input('region');
-        //Query Process
-        
-
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        ///End query
-        return view('generateturnout.generate',['region'=>$region, 'year'=>$year, 'period'=>$period]);
-        
+        $months = $request->input('months');
+        return view('generateturnout.generate',['region'=>$region, 'year'=>$year, 'period'=>$period, 'months'=> $months]);
     }
 }    

@@ -102,7 +102,7 @@
                                         @if(Auth::check())										
                                             <li><a href="{{ route('generateturnout.index') }}" class="widgets"><span>Generate Turnout</span></a></li>										
                                             <li><a href="{{ route('listturnout.index') }}" class="widgets"><span>List</span></a></li>								
-                                            <li><a href="{{ route('uploadfile.index') }}" class="widgets"><span>Import Files</span></a></li>										
+                                            <!-- li><a href="{{ route('uploadfile.index') }}" class="widgets"><span>Import Files</span></a></li -->
                                         @endif
 									</ul>	
 								</li>

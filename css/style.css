@@ -442,7 +442,7 @@ button,input,select,textarea { font-size: 12px; font-family: Arial, Helvetica, s
 .stdform div.par { overflow: hidden; }
 .stdform span.field, .stdform div.field { margin-left: 220px; display: block; position: relative; }
 .stdform .formwrapper { display: block; padding-top: 5px; margin-left: 220px; line-height: 25px; }
-.stdform label { float: left; width: 200px; text-align: right; padding: 5px 20px 0 0; }
+.stdform label { float: left; width: 90px; text-align: right; padding: 5px 20px 0 0; }
 .stdform label.error { float: none; color: #ff6600; font-size: 11px; display: block; text-align: left; font-weight: bold; }
 
 .stdform input { 
@@ -499,6 +499,7 @@ button,input,select,textarea { font-size: 12px; font-family: Arial, Helvetica, s
 .stdform2 label.error { margin-left: 0; padding: 0; }
 .stdform2 label small { font-size: 11px; color: #999; display: block; font-weight: normal; line-height: 16px; }
 .stdform2 span.field, .stdform2 div.field { margin-left: 220px; display: block; background: #fff; padding: 20px; border-left: 1px solid #ddd; }
+.stdform2 span.field2, .stdform2 div.field2 { margin-left: 130px; display: block; background: #fff; padding: 15px; border-left: 1px solid #ddd; }
 .stdform2 .stdformbutton { margin-left: 0; padding: 20px; background: #fff; }
 
 /**DUAL SELECT**/

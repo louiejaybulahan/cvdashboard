@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Upload Turn Out Data')
+@section('title', 'Backend Processing')
 @section('optLayout','noright')
 
 @section('cssExtention')
@@ -14,7 +14,10 @@
 
 <script type="text/javascript">
 var jsLastRender = 0;
-jQuery(window).ready(function () {    
+var jsCheckScheduled = null;
+
+jQuery(window).ready(function () {  
+    startChecking();
     jQuery('.btnBack').click(function () {
         jQuery('#divNew').hide();        
         jQuery('#divList').fadeIn();
@@ -48,8 +51,7 @@ jQuery(window).ready(function () {
         }).done(function(){
             jQuery('#btnSave').attr('class','stdbtn btn_black').prop('disabled',false);            
         });
-    }); 
-       
+    });        
 });  
 function jsMessage(message) { jQuery.jGrowl(message); return false; }
 function jsDelete(id){
@@ -75,16 +77,29 @@ function jsRender(){
     jQuery('#displayOutput').attr('src',"{{ route('uploadfile.renderfile') }}");
     return false;
 }
+function startChecking() {
+    jsCheckScheduled = setInterval(function () {        
+        jsCheckSchduled();
+    }, 3000);
+}
+function stopChecking(){
+    clearInterval(jsCheckScheduled);
+    return false;
+}
+function jsCheckSchduled(){
+    $.getJSON("{{ route('backgroundprocess.checkscript') }}", function( data ) {        
+    });
+}
 </script>
 @endsection
 
 @section('content')  
 
 
-<div class="one_half">	
+<div class="">	
     <div id="divList">  
         <div class="contenttitle">
-            <h2 class="form"><span>Process List</span></h2>
+            <h2 class="form"><span>Script List List</span></h2>
         </div>	   
         <div class="tableoptions">
             <button class="deletebutton radius3" title="table1" id="btnNew">Add Script</button> &nbsp;
@@ -93,22 +108,28 @@ function jsRender(){
             <colgroup>
                 <col class="con0" width="200">
                 <col class="con1" >
-                <col class="con0" width="100">
+                <col class="con0" width="300">
+                <col class="con1" width="150">
+                <col class="con0" width="150">
                 <col class="con1" width="100">
             </colgroup>
             <thead>
                 <tr>
                     <th class="head0">Scriptname</th>
                     <th class="head1">Source</th>
-                    <th class="head0">Status</th>
+                    <th class="head0">Parameter</th>
+                    <th class="head1">Run In</th>
+                    <th class="head0">Time</th>
                     <th class="head1">Options</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>                    
-                <th class="head0">Scriptname</th>
+                    <th class="head0">Scriptname</th>
                     <th class="head1">Source</th>
-                    <th class="head0">Status</th>
+                    <th class="head0">Parameter</th>
+                    <th class="head1">Run In</th>
+                    <th class="head0">Time</th>
                     <th class="head1">Options</th>
                 </tr>
             </tfoot>
@@ -119,15 +140,15 @@ function jsRender(){
                             <input type="hidden" id="url_{{ $r->id }}" name="url_{{ $r->id }}" value="{{ $r->url }}"> 
                             {{ $r->scriptname }}
                         </td>
-                        <td>{{ $r->url }}</td>
-                        <td id="tdStatus_{{ $r->id }}">
-                            {{ ($r->status)?'process':'' }}                            
-                        </td>
+                        <td>{{ $r->url }} </td>
+                        <td>{{ $r->parameters }} </td>
+                        <td>{{ $r->run_in }} </td>
+                        <td>{{ $r->time }} </td>                        
                         <td><center><a href="#Delete-{{ $r->id }}" class="stdbtn"  style="opacity: 1;" onclick="jsDelete('{{ $r->id }}');">Delete</a></center></td>
                     </tr>
                 @endforeach
             </tbody>
-        </table>   
+        </table> 
     </div> 
     <div id="divNew" style="display:none;">        
         <div class="contenttitle">
@@ -141,27 +162,85 @@ function jsRender(){
             <p>
                 <label>Url Source</label>
                 <span class="field"><input type="text" name="url" id="url" class="longinput"></span>
-            </p>                                                
+            </p>
+            <p>
+                <label>Parameters</label>
+                <span class="field"><input type="text" name="parameters" id="parameters" class="longinput"></span>
+            </p>
+            <p>
+                <label>Run in</label>
+                <span class="field">
+                    <select id="run_in" name="run_in">
+                        <option value="Year">Every Year</option>
+                        <option value="Month">Every Month</option>                        
+                        <option value="Days">Every Day</option>
+                        <!-- option value="Hour">Every Hour</option -->
+                        <!-- option value="Once">Once</option -->
+                        <!-- option value="6">Every Weeks</option -->
+                    </select>
+                </span>                
+            </p>            
+            <p>
+                <label>Time to run</label>
+                <span class="field">
+                    <select id="time" name="time">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                        <option>11</option>
+                        <option>12</option>
+                        <option>13</option>
+                        <option>14</option>
+                        <option>15</option>
+                        <option>16</option>
+                        <option>17</option>
+                        <option>18</option>
+                        <option>19</option>
+                        <option>20</option>
+                        <option>21</option>
+                        <option>22</option>
+                        <option>23</option>
+                        <option>24</option>
+                    </select>
+                    <small class="desc" style="margin:0px;">Note : 24hrs format</small>
+                </span>                
+            </p>                                                                                                            
             <p class="stdformbutton">
                 <span id="divListError" style="color:red;display:none;"></span><br>
                 <button class="submit radius2 btnBack">Back</button>
                 <button class="submit radius2" id="btnSave">Save Script</button>                
             </p>
-        {{ Form::close() }}  <br>
-        <p>
-            
-        </p>
-    </div>
-</div>
+        {{ Form::close() }} 
+    </div>     
 
-<div class="one_half last">
-    <div class="widgetbox" >
-        <div class="title"><h2 class="tabbed"><span>Results</span></h2></div>
-        <div class="widgetcontent padding0">                
-             <iframe name="displayOutput" id="displayOutput" style="min-height: 485px;border: 1px #000 dashed; overflow-y: scroll; width: 100%;" ></iframe>
-        </div><!--widgetcontent-->         
-    </div>
-</div>    
+        <br clear="all">
+        
+        <div class="one_half">
+            <div class="widgetbox" >
+                <div class="title"><h2 class="tabbed"><span>Todays Schedule</span></h2></div>
+                <div class="widgetcontent">                
 
+                </div><!--widgetcontent-->         
+            </div>
+        </div>   
+        <div class="one_half last">
+            <div class="widgetbox" >
+                <div class="title"><h2 class="tabbed"><span>Display Script</span></h2></div>
+                <div class="widgetcontent padding0">                
+                    <iframe name="displayOutput" id="displayOutput" style="min-height: 485px;border: 1px #000 dashed; overflow-y: scroll; width: 100%;" ></iframe>
+                </div><!--widgetcontent-->         
+            </div>
+        </div> 
+
+</div>  
 <br clear="all">
+
+
 @endsection

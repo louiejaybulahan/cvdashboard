@@ -186,7 +186,10 @@ use Illuminate\Support\Facades\Session;
                             try{                                         
                                 DB::insert('insert into '.$table.$sesdata['year'].'_'.$sesdata['period'].' values('.implode(',',$field).')',$param);                
                                 echo '[ ' . $index . ' ] - Data successfully inserted!. '.$param[1].' - '.$param[2].' - '.$param[3].' - '.$param[4].'<br>';                                        
+                                success++;
+                                
                             }catch(\Illuminate\Database\QueryException $ex){                        
+                                $errors++;
                                 $listError[] = $ex->getMessage();
                                 echo '<span style="color:red">[ ' . $index . ' ] (3)- Error on ' . $table. ' :  ' . $ex->getMessage() . '. </span><br>';                                            
                             }        

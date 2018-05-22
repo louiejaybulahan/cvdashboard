@@ -6,7 +6,7 @@ use Auth;
 use Illuminate\Http\Request;
 //use Illuminate\Routing\UrlGenerator;
 //use Illuminate\Routing\Redirector;
-//use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 
 
 class SiteController extends Controller {
@@ -25,7 +25,9 @@ class SiteController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {                                      
-        return view('site.site');               
+    public function index() {      
+
+		$category = DB::table('tbl_turnout')->select(DB::raw('category'))->groupBy('category')->get();	
+        return view('site.site',['category'=>$category]);               
     }
 }

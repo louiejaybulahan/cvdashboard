@@ -22,7 +22,7 @@ class BackgroundprocessController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {     
+    public function index() {            
         $list = Processlist::all();                                         
         return view('backgroundprocess.index',[
             'processlist' => $list
@@ -32,9 +32,16 @@ class BackgroundprocessController extends Controller {
     public function addscript(Request $request){        
         $model = new Processlist;        
         $status = 'new'; 
-        if ($model->validateForm($request)) {                               
+        if ($model->validateForm($request)) {     
+            $history = [
+                'date' => date('Y-m-d')
+            ];                          
             $model->scriptname = $request->scriptname;
             $model->url = $request->url;
+            $model->parameters = $request->parameters;
+            $model->run_in = $request->run_in;
+            $model->time = $request->time;      
+            $model->history = json_encode($history);      
             $model->status = 0;               
             $model->save();
             return response()->json(['flag' => 1,'msg' => 'Successfully Save','token' => csrf_token()]);
@@ -52,8 +59,23 @@ class BackgroundprocessController extends Controller {
             else{ $msg = 'Invalid Action'; }
         }else{ $msg = 'Invalid ID'; }                
         return response()->json(['flag' => $flag,'msg' => $msg,'id' => $request->id, 'token' => csrf_token()]);
-    }     
-    public function loadscript(){        
+    }   
+    public function checkscript(){
+        $getFirstRow = null;
+        $getInfo = [];        
+        $element = 0;
+        $model = \App\Models\Processlist::first();                 
+        return response()->json([
+            'scriptname' => $model->scriptname,
+            'url' => $model->url,
+            'parameters' => $model->parameters,
+            'run_in' => $model->run_in,
+            'time' => $model->time,
+            'history' => json_decode($model->history)
+        ]);
+    }  
+    public function loadscript(){    
+
     }  
     public function readnextscript(){
     }     

@@ -17,7 +17,7 @@
 <script type="text/javascript" src="{{ asset('js/modal/jquery.modal.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/jquery-confirm/js/jquery-confirm.js') }}"></script>
 <script type="text/javascript">
-function generateturnout(region,year,period){
+function generateturnout(region,year,period,months){
     $.confirm({
         title: 'Generate turnout?',
         content: 'This will generate compliance verification turnout with the details below.<br><br>REGION&nbsp;: '+region+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;YEAR&nbsp;: '+year+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PERIOD&nbsp;: '+period+'<br><br>Do you want to continue?',
@@ -65,7 +65,7 @@ function generateturnout(region,year,period){
                             <td>{{$reg->REGION_NICK}}</td>
                             <td>{{$periodActive->year}}</td>
                             <td>{{$periodActive->period}}</td>
-                            <td><button class="btn classgenerate" id="btngenerate_{{$reg->REGION_NICK.'_'.$periodActive->year.'_'.$periodActive->period}}" href='javascript://' onclick="generateturnout('{{$reg->REGION_NICK}}',{{$periodActive->year}},{{$periodActive->period}})" set-path="{{ route('generateturnout.generate',['region'=>$reg->REGION_NICK, 'year'=>$periodActive->year,'period'=>$periodActive->period]) }}">-</button></td>
+                            <td><button class="btn classgenerate" id="btngenerate_{{$reg->REGION_NICK.'_'.$periodActive->year.'_'.$periodActive->period}}" href='javascript://' onclick="generateturnout('{{$reg->REGION_NICK}}',{{$periodActive->year}},{{$periodActive->period}},'{{$periodActive->months}}')" set-path="{{ route('generateturnout.generate',['region'=>$reg->REGION_NICK, 'year'=>$periodActive->year,'period'=>$periodActive->period,'months'=>$periodActive->months]) }}">-</button></td>
                         </tr>
                     @endforeach
                     
