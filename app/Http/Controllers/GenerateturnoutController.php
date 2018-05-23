@@ -1,6 +1,5 @@
 <?php
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -33,8 +32,7 @@ class GenerateturnoutController extends Controller {
     public function generate(Request $request){
         $year = $request->input('year');
         $period = $request->input('period');
-        $region = $request->input('region');
         $months = $request->input('months');
-        return view('generateturnout.generate',['region'=>$region, 'year'=>$year, 'period'=>$period, 'months'=> $months]);
+        return view('generateturnout.generate',['year'=>$year, 'period'=>$period, 'months'=> $months]);
     }
 }    

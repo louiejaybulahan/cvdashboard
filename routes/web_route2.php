@@ -11,7 +11,20 @@
 |
 */
 
-// OBTR MENUS v1.0
+
+Route::group(['prefix' => 'site', 'as' => 'site.'], function () {
+    Route::get('/','SiteController@index')->name('index');      
+	Route::get('exportexcel','SiteController@exportexcel')->name('exportexcel');      
+	Route::post('exportexcel','SiteController@exportexcel')->name('exportexcel');      
+	Route::post('dashboarddata','SiteController@dashboarddata')->name('dashboarddata');      
+	Route::get('dashboarddata','SiteController@dashboarddata')->name('dashboarddata');      
+    Route::get('paidunpaidbrgy','SiteController@getPaidUnpaidByBarangay')->name('paidunpaidbrgy');      
+    Route::get('grandtotalpaidunpaidbyperiod','SiteController@getGrandTotalPaidUnpaidByPeriod')->name('grandtotalpaidunpaidbyperiod');      
+    Route::post('saveRequest','SiteController@saveRequest')->name('saveRequest');      
+    Route::get('removeRequest','SiteController@removeRequest')->name('removeRequest');
+    Route::get('paidunpaid','SiteController@paidunpaid')->name('paidunpaid');    
+    Route::get('totalbeneficiarybyprovince','SiteController@totalbeneficiarybyprovince')->name('totalbeneficiarybyprovince');    
+});
 
 Route::group(['prefix' => 'obtrfileupload', 'as' => 'obtrfileupload.'], function () {   
     Route::get('/','ObtrfileuploadController@index')->name('index');    

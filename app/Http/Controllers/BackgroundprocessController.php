@@ -65,25 +65,46 @@ class BackgroundprocessController extends Controller {
     }   
     public function checkscript(Request $request){
         $getFirstRow = null;
-        $getInfo = [];        
-        $element = 0;
-        $model = \App\Models\Processlist::all();  
-                        
-        $index = intval($request->row);
+        $info = [];        
+        $detect = $element = 0;
+        $index = intval($request->row);        
+        $list = \App\Models\Processlist::all();  
+        foreach($list AS $r){
+            $info[] = [
+                'scriptname' => $r->scriptname,
+                'url' => $r->url,
+                'parameters' => $r->parameters,
+                'run_in' => $r->run_in,
+                'time' => $r->time,
+                'status' => $r->status,
+                'history' => json_decode($r->history)
+            ];
+            if($index<$element){
+                $detect = $element;
+            }
+            $element++;
+        }         
+        if(!$detect) $index = $detect;        
         $index++;
         return response()->json([
             'rowIndex' => $index,
-            'scriptname' => $model->scriptname,
-            'url' => $model->url,
-            'parameters' => $model->parameters,
-            'run_in' => $model->run_in,
-            'time' => $model->time,
-            'history' => json_decode($model->history)
+            'scriptname' => $info[$detect]['scriptname'],
+            'url' => $info[$detect]['url'],
+            'parameters' => $info[$detect]['parameters'],
+            'run_in' => $info[$detect]['run_in'],
+            'time' => $info[$detect]['time'],
+            'status' => $info[$detect]['status'],
+            'history' => $info[$detect]['history']
         ]);
     }  
-    public function loadscript(){    
-
-    }  
-    public function readnextscript(){
+    public function status(Request $request){
+        $flag = 0;
+        $status = 0;        
+        $model = Processlist::find($request->id);
+        $status = ($request->status==0)?1:0;
+        $model->status = $status;
+        if($model->save()){ $msg = 'Successfully Done!. Status Change'; }
+        else{ $msg = 'Error Request!. Invalid to change status'; }
+        return response()->json(['flag' => $flag,'msg' => $msg,'status' => $status]);
     }     
 }

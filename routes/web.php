@@ -29,15 +29,6 @@ Route::get('/submit', function () {
 Route::get('/logout',function(){ return Redirect::to('login'); });
 Route::get('/loguser','Auth\LoginController@loguser')->name('loguser');     
 
-Route::group(['prefix' => 'site', 'as' => 'site.'], function () {
-    Route::get('/','SiteController@index')->name('index');      
-    Route::get('paidunpaidbrgy','SiteController@getPaidUnpaidByBarangay')->name('paidunpaidbrgy');      
-    Route::get('grandtotalpaidunpaidbyperiod','SiteController@getGrandTotalPaidUnpaidByPeriod')->name('grandtotalpaidunpaidbyperiod');      
-    Route::post('saveRequest','SiteController@saveRequest')->name('saveRequest');      
-    Route::get('removeRequest','SiteController@removeRequest')->name('removeRequest');
-    Route::get('paidunpaid','SiteController@paidunpaid')->name('paidunpaid');    
-    Route::get('totalbeneficiarybyprovince','SiteController@totalbeneficiarybyprovince')->name('totalbeneficiarybyprovince');    
-});
 
 Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
     Route::get('/','UsersController@index')->name('index');    
@@ -114,9 +105,7 @@ Route::group(['prefix' => 'backgroundprocess', 'as' => 'backgroundprocess.'], fu
     Route::get('checkscript','BackgroundprocessController@checkscript')->name('checkscript');      
     Route::post('addscript','BackgroundprocessController@addscript')->name('addscript');  
     Route::post('remove','BackgroundprocessController@remove')->name('remove');      
-
-    Route::post('loadscript','BackgroundprocessController@loadscript')->name('loadscript');      
-    Route::post('readnextcript','BackgroundprocessController@readnextcript')->name('readnextcript');  
+    Route::post('status','BackgroundprocessController@status')->name('status');      
 });
 
 

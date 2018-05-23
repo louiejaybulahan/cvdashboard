@@ -17,16 +17,19 @@
 <script type="text/javascript" src="{{ asset('js/modal/jquery.modal.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/jquery-confirm/js/jquery-confirm.js') }}"></script>
 <script type="text/javascript">
-function generateturnout(region,year,period,months){
+function generateturnout(year,period,months){
     $.confirm({
         title: 'Generate turnout?',
-        content: 'This will generate compliance verification turnout with the details below.<br><br>REGION&nbsp;: '+region+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;YEAR&nbsp;: '+year+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PERIOD&nbsp;: '+period+'<br><br>Do you want to continue?',
+        content: 'This will generate compliance verification turnout with the details below.<br><br>YEAR&nbsp;: '+year+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PERIOD&nbsp;: '+period+'<br><br>Do you want to continue?',
         draggable: true,
         type: 'blue',
         closeIcon: true,
         buttons: {
             confirm: function () {    
-                $("#displayOutput").attr("src", $('#btngenerate_'+region+'_'+year+'_'+period).attr('set-path'));                
+                $("#displayOutput").attr("src", $('#btngenerate').attr('set-path')); 
+                $("#btngenerate").hide();
+                $("#btncancel").show();
+                
             },
             cancel: function () {
             }
@@ -34,7 +37,29 @@ function generateturnout(region,year,period,months){
     });    
     //$('.classgenerate').prop('disabled',true);
 }
-
+function regionProgress(percent,region){
+    $('#region_'+region).html(percent+'% completed');
+}
+function regionProgressError(error,region){
+    $('#error_region_'+region).html(error+' errors found');
+}
+function cancelGenerate(){
+    $.confirm({
+        title: 'Cancel generation?',
+        content: 'This will cancel the generation of turnout data.<br><br>Do you want to continue?',
+        draggable: true,
+        type: 'blue',
+        closeIcon: true,
+        buttons: {
+            confirm: function () {    
+                location.reload();
+            },
+            cancel: function () {
+            }
+        }
+    });    
+    
+}
 </script>
 @endsection
 
@@ -56,7 +81,7 @@ function generateturnout(region,year,period,months){
                         <th class="head0">Region</th>
                         <th class="head1">Year</th>
                         <th class="head0">Period</th>
-                        <th class="head1">Generate</th>
+                        <th class="head1">Progress</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +90,7 @@ function generateturnout(region,year,period,months){
                             <td>{{$reg->REGION_NICK}}</td>
                             <td>{{$periodActive->year}}</td>
                             <td>{{$periodActive->period}}</td>
-                            <td><button class="btn classgenerate" id="btngenerate_{{$reg->REGION_NICK.'_'.$periodActive->year.'_'.$periodActive->period}}" href='javascript://' onclick="generateturnout('{{$reg->REGION_NICK}}',{{$periodActive->year}},{{$periodActive->period}},'{{$periodActive->months}}')" set-path="{{ route('generateturnout.generate',['region'=>$reg->REGION_NICK, 'year'=>$periodActive->year,'period'=>$periodActive->period,'months'=>$periodActive->months]) }}">-</button></td>
+                            <td><span id='region_{{$reg->REGION_NICK}}'></span>&nbsp;&nbsp;&nbsp;<font color=red><span id='error_region_{{$reg->REGION_NICK}}'></span></font></td>
                         </tr>
                     @endforeach
                     
@@ -74,6 +99,10 @@ function generateturnout(region,year,period,months){
             </table>
         </div><!--widgetcontent-->
     </div>
+<div>
+<button class="stdbtn" style="margin-top: 0px;margin-bottom: 10px;" id="btngenerate" href='javascript://' onclick="generateturnout({{$periodActive->year}},{{$periodActive->period}},'{{$periodActive->months}}')" set-path="{{ route('generateturnout.generate',['year'=>$periodActive->year,'period'=>$periodActive->period,'months'=>$periodActive->months]) }}">Generate Now!</button>            
+<button class="stdbtn" onclick="cancelGenerate()" style="margin-top: 0px;margin-bottom: 10px;display:none;" id="btncancel" href="javascript://">Cancel</button>            
+</div>
 <div class="notification msgalert"><a class="close"></a><p>You can change year and period by changing it in SET ACTIVE PERIOD tab.</p></div>
 
 
@@ -81,9 +110,9 @@ function generateturnout(region,year,period,months){
 
 <div class="one_half last">
     <div class="widgetbox" >
-        <div class="title"><h2 class="tabbed"><span>Results</span></h2></div>
+        <div class="title"><h2 class="tabbed"><span>OVERALL PROGRESS</span></h2></div>
         <div class="widgetcontent padding0">                
-            <iframe name="displayOutput" id="displayOutput" style="min-height: 719px;overflow-y: scroll; width: 100%;" ></iframe>
+            <iframe name="displayOutput" id="displayOutput" style="min-height: 719px;overflow-y: scroll; width: 100%;position: inherit" ></iframe>
         </div><!--widgetcontent-->         
     </div>
 </div>    

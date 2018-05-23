@@ -15,10 +15,8 @@
 <script type="text/javascript">
 var jsLastRender = 0;
 var jsCheckScheduled = null;
-
-jQuery(window).ready(function () {  
-    // startChecking(1);
-    jsGetScheduled();
+var jsScriptCommand = 0;
+jQuery(window).ready(function () {      
     jQuery('.btnBack').click(function () {
         jQuery('#divNew').hide();        
         jQuery('#divList').fadeIn();
@@ -52,18 +50,31 @@ jQuery(window).ready(function () {
         }).done(function(){
             jQuery('#btnSave').attr('class','stdbtn btn_black').prop('disabled',false);            
         });
+    });     
+    jQuery('#btnStopScript').click(function(){
+        jsScriptCommand = 1;
+        jQuery(this).hide();
+        jQuery('#btnStartScript').fadeIn();
+    });
+    jQuery('#btnStartScript').click(function(){
+        jsScriptCommand = 0;
+        jQuery(this).hide();
+        jQuery('#btnStopScript').fadeIn();
+        jsGetScheduled();
     });        
+    jQuery('#btnStopScript').trigger('click');
+    jsGetScheduled();
 });  
 function jsMessage(message) { jQuery.jGrowl(message); return false; }
 function jsDelete(id){
     var dataString = {'_token':'{{ csrf_token() }}', 'id':id};
     jQuery.ajax({
-    type: "POST", url: "{{ route('backgroundprocess.remove') }}", data: dataString, dataType: 'json', cache: false,
+            type: "POST", url: "{{ route('backgroundprocess.remove') }}", data: dataString, dataType: 'json', cache: false,
             error: function (request, status, error) { jsMessage('Error Request'); },
             success: function (data) {
                 jsMessage(data.msg);
                 if (data.flag == 1){ jQuery('#row_' + data.id).remove(); } 
-                jsToken(data.token);                 
+                jsToken(data.token);                   
             }
     });
     return false;
@@ -78,6 +89,19 @@ function jsRender(){
     jQuery('#displayOutput').attr('src',"{{ route('uploadfile.renderfile') }}");
     return false;
 }
+function changeStatus(tmpClass){    
+    var idClass = tmpClass.split('-');
+    var dataString = {'_token':'{{ csrf_token() }}', 'id':idClass[0],'status':idClass[1]};
+    jQuery.ajax({
+        type: "POST", url: "{{ route('backgroundprocess.status') }}", data: dataString, dataType: 'json', cache: false,                   
+        error: function (request, status, error) { jsMessage('Error Request'); },
+        success: function (data) {
+            var txt = (data.status==0)?'Active':'Block';                                         
+            jQuery('#td_'+idClass[0]).html('<a href="#status '+idClass[0]+'-'+data.status+'" onclick="changeStatus(\''+idClass[0]+'-'+data.status+'\');">'+txt+'</a>');
+            console.log('don');              
+        }    
+    });      
+}
 // function startChecking() {
 //     jsCheckScheduled = setInterval(function () {        
 //         jsCheckSchduled();
@@ -88,28 +112,31 @@ function jsRender(){
 //     return false;
 // }
 function jsGetScheduled(){
-    var index = eval(jQuery('#rowIndex').val());
-    var url = "{{ route('backgroundprocess.checkscript',['row'=> '']) }}";
-    $.getJSON(url+index, function( data ) {             
-        var htmHistory = '';     
-        if(data.history!='' && jQuery.isEmptyObject(data.history)==false){             
-            jQuery.each(data.history,function(key,val){
-                htmHistory += '* '+key + ' : ' + val+'<br>';
-            });            
-        }      
-        jsLoadScriptFound(data.url);
-        jQuery('#htmScriptname').html(data.scriptname);
-        jQuery('#htmUrl').html(data.url);
-        jQuery('#htmParameters').html(data.parameters);        
-        jQuery('#htmRunin').html(data.run_in);        
-        jQuery('#htmHistory').html(htmHistory);
-        jQuery('#rowIndex').val(data.rowIndex);   
-
-    });
+    if(jsScriptCommand==0){
+        var index = eval(jQuery('#rowIndex').val());
+        var url = "{{ route('backgroundprocess.checkscript',['row'=> '']) }}";
+        $.getJSON(url+index, function( data ) {             
+            var htmHistory = '';     
+            if(data.history!='' && jQuery.isEmptyObject(data.history)==false){             
+                jQuery.each(data.history,function(key,val){
+                    htmHistory += '* '+key + ' : ' + val+'<br>';
+                });            
+            }      
+            jsLoadScriptFound(data.url);
+            jQuery('#htmScriptname').html(data.scriptname);
+            jQuery('#htmUrl').html(data.url);
+            jQuery('#htmParameters').html(data.parameters);        
+            jQuery('#htmRunin').html(data.run_in);        
+            jQuery('#htmHistory').html(htmHistory);
+            jQuery('#rowIndex').val(data.rowIndex);   
+        });
+    }
     return false;
 }
-function jsQueryProcessDone(){    
-    jsGetScheduled();
+function jsQueryProcessDone(){  
+    if(jsScriptCommand==0){
+        jsGetScheduled();
+    }
     return false;
 }
 function jsLoadScriptFound(jsUrl){
@@ -128,6 +155,7 @@ function jsLoadScriptFound(jsUrl){
     */
     return false;
 }
+
 </script>
 @endsection
 
@@ -141,6 +169,8 @@ function jsLoadScriptFound(jsUrl){
         </div>	   
         <div class="tableoptions">
             <button class="deletebutton radius3" title="table1" id="btnNew">Add Script</button> &nbsp;
+            <button class="deletebutton radius3 btn_red" title="table1" id="btnStopScript">Stop Script</button> &nbsp;
+            <button class="deletebutton radius3" title="table1" id="btnStartScript" style="display:none;">Start Script</button> &nbsp;
         </div>
         <input type="hidden" id="rowIndex" name="rowIndex" value="0">
         <table cellpadding="0" cellspacing="0" border="0" class="stdtable stdtablecb">
@@ -150,7 +180,8 @@ function jsLoadScriptFound(jsUrl){
                 <col class="con0" width="300">
                 <col class="con1" width="150">
                 <col class="con0" width="150">
-                <col class="con1" width="100">
+                <col class="con1" width="50">
+                <col class="con0" width="100">
             </colgroup>
             <thead>
                 <tr>
@@ -159,7 +190,8 @@ function jsLoadScriptFound(jsUrl){
                     <th class="head0">Parameter</th>
                     <th class="head1">Run In</th>
                     <th class="head0">Time</th>
-                    <th class="head1">Options</th>
+                    <th class="head1">Status</th>
+                    <th class="head0">Options</th>
                 </tr>
             </thead>
             <tfoot>
@@ -169,7 +201,8 @@ function jsLoadScriptFound(jsUrl){
                     <th class="head0">Parameter</th>
                     <th class="head1">Run In</th>
                     <th class="head0">Time</th>
-                    <th class="head1">Options</th>
+                    <th class="head1">Status</th>
+                    <th class="head0">Options</th>
                 </tr>
             </tfoot>
             <tbody>
@@ -182,7 +215,8 @@ function jsLoadScriptFound(jsUrl){
                         <td>{{ $r->url }} </td>
                         <td>{{ $r->parameters }} </td>
                         <td>{{ $r->run_in }} </td>
-                        <td>{{ $r->time }} </td>                        
+                        <td>{{ $r->time }} </td>
+                        <td id="td_{{$r->id}}"><a href="#status-{{$r->id}}-{{$r->status}}" onclick="changeStatus('{{$r->id}}-{{$r->status}}');">{{ $r->status==0 ? 'Active':'Block' }}</a> </td>
                         <td><center><a href="#Delete-{{ $r->id }}" class="stdbtn"  style="opacity: 1;" onclick="jsDelete('{{ $r->id }}');">Delete</a></center></td>
                     </tr>
                 @endforeach

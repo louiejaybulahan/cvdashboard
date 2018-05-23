@@ -20,7 +20,9 @@ class ListTurnoutController extends Controller {
      * @return void
      */
     public function __construct() {
-        $this->middleware('auth');
+        // $this->middleware('auth');
+        // $this->middleware('auth', ['only' => 'index']);
+        $this->middleware('auth', ['except' => ['rebuildfilter']]);
     }
 
     /**
