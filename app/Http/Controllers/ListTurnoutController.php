@@ -583,6 +583,7 @@ class ListTurnoutController extends Controller {
             unset($data['id']);
             unset($data['year']);
             $filters->where('year',$year)->update($data);
-        }
+        }        
+        return view('listturnout.rebuildfilter');
     }             
 }

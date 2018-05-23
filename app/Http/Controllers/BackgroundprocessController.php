@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Illuminate\Http\Request;
-use \App\Models\Processlist;
+use App\Helpers\AppTools;
+use App\Models\Processlist;
 
 class BackgroundprocessController extends Controller {
 
@@ -34,7 +35,9 @@ class BackgroundprocessController extends Controller {
         $status = 'new'; 
         if ($model->validateForm($request)) {     
             $history = [
-                'date' => date('Y-m-d')
+                'date_last_executed' => date('Y-m-d'),
+                'time_last_executed' => date('h:i:s A'),
+                'ip' => AppTools::getLocalIpAddress()
             ];                          
             $model->scriptname = $request->scriptname;
             $model->url = $request->url;
@@ -60,12 +63,16 @@ class BackgroundprocessController extends Controller {
         }else{ $msg = 'Invalid ID'; }                
         return response()->json(['flag' => $flag,'msg' => $msg,'id' => $request->id, 'token' => csrf_token()]);
     }   
-    public function checkscript(){
+    public function checkscript(Request $request){
         $getFirstRow = null;
         $getInfo = [];        
         $element = 0;
-        $model = \App\Models\Processlist::first();                 
+        $model = \App\Models\Processlist::all();  
+                        
+        $index = intval($request->row);
+        $index++;
         return response()->json([
+            'rowIndex' => $index,
             'scriptname' => $model->scriptname,
             'url' => $model->url,
             'parameters' => $model->parameters,

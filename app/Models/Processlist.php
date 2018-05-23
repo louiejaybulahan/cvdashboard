@@ -30,7 +30,7 @@ class Processlist extends Model
         switch($validationOption){
             case 'new':
                 $validate = Validator::make($request->all(), [                                      
-                    'scriptname' => 'required|max:45',
+                    'scriptname' => 'required|max:100',
                     'url' => 'required|max:100',    
                     'run_in' => 'required|max:10',    
                     'time' => 'required|max:2',    
@@ -39,7 +39,7 @@ class Processlist extends Model
             break;
             case 'update':
                 $validate = Validator::make($request->all(), [                                      
-                    'scriptname' => 'required|max:45',
+                    'scriptname' => 'required|max:100',
                     'url' => 'required|max:100',    
                     'run_in' => 'required|max:10',    
                     'time' => 'required|max:2',            

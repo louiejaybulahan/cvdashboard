@@ -17,7 +17,8 @@ var jsLastRender = 0;
 var jsCheckScheduled = null;
 
 jQuery(window).ready(function () {  
-    startChecking();
+    // startChecking(1);
+    jsGetScheduled();
     jQuery('.btnBack').click(function () {
         jQuery('#divNew').hide();        
         jQuery('#divList').fadeIn();
@@ -77,18 +78,55 @@ function jsRender(){
     jQuery('#displayOutput').attr('src',"{{ route('uploadfile.renderfile') }}");
     return false;
 }
-function startChecking() {
-    jsCheckScheduled = setInterval(function () {        
-        jsCheckSchduled();
-    }, 3000);
-}
-function stopChecking(){
-    clearInterval(jsCheckScheduled);
+// function startChecking() {
+//     jsCheckScheduled = setInterval(function () {        
+//         jsCheckSchduled();
+//     }, 3000);
+// }
+// function stopChecking(){
+//     clearInterval(jsCheckScheduled);
+//     return false;
+// }
+function jsGetScheduled(){
+    var index = eval(jQuery('#rowIndex').val());
+    var url = "{{ route('backgroundprocess.checkscript',['row'=> '']) }}";
+    $.getJSON(url+index, function( data ) {             
+        var htmHistory = '';     
+        if(data.history!='' && jQuery.isEmptyObject(data.history)==false){             
+            jQuery.each(data.history,function(key,val){
+                htmHistory += '* '+key + ' : ' + val+'<br>';
+            });            
+        }      
+        jsLoadScriptFound(data.url);
+        jQuery('#htmScriptname').html(data.scriptname);
+        jQuery('#htmUrl').html(data.url);
+        jQuery('#htmParameters').html(data.parameters);        
+        jQuery('#htmRunin').html(data.run_in);        
+        jQuery('#htmHistory').html(htmHistory);
+        jQuery('#rowIndex').val(data.rowIndex);   
+
+    });
     return false;
 }
-function jsCheckSchduled(){
-    $.getJSON("{{ route('backgroundprocess.checkscript') }}", function( data ) {        
+function jsQueryProcessDone(){    
+    jsGetScheduled();
+    return false;
+}
+function jsLoadScriptFound(jsUrl){
+    jQuery('#displayOutput').attr('src',jsUrl);    
+    /*
+    jQuery('#displayOutput').html(' Loading ... ');        
+    var ifr=$('<iframe/>', {
+        id:'MainPopupIframe',
+        src: jsUrl,
+        style:'min-height: 268px;border: 1px #000 dashed; overflow-y: scroll; width: 100%;',
+        load:function(){                
+            jsMessage('Script is Done');
+        }
     });
+    $('#displayOutput').html(ifr);                
+    */
+    return false;
 }
 </script>
 @endsection
@@ -104,9 +142,10 @@ function jsCheckSchduled(){
         <div class="tableoptions">
             <button class="deletebutton radius3" title="table1" id="btnNew">Add Script</button> &nbsp;
         </div>
+        <input type="hidden" id="rowIndex" name="rowIndex" value="0">
         <table cellpadding="0" cellspacing="0" border="0" class="stdtable stdtablecb">
             <colgroup>
-                <col class="con0" width="200">
+                <col class="con0" width="300">
                 <col class="con1" >
                 <col class="con0" width="300">
                 <col class="con1" width="150">
@@ -226,21 +265,47 @@ function jsCheckSchduled(){
             <div class="widgetbox" >
                 <div class="title"><h2 class="tabbed"><span>Todays Schedule</span></h2></div>
                 <div class="widgetcontent">                
-
+                        <p>
+                            <h2>Files Read :
+                                <u id="htmScriptname"></u>
+                            </h2>
+                        </p>
+                        <br clear="all">
+                        <p>
+                            <h2>Source url :
+                                <u id="htmUrl"></u>
+                            </h2>
+                        </p>
+                        <br clear="all">
+                        <p>
+                            <h2>Parameters :
+                                <u id="htmParameters"></u>
+                            </h2>
+                        </p>
+                        <br clear="all">
+                        <p>
+                            <h2>Run this Application : Every
+                                <u id="htmRunin"></u>
+                            </h2>
+                        </p> 
+                        <br clear="all">
+                        <p>
+                            <h2>Last Script Run</h2>
+                            <span id="htmHistory"></span>
+                        </p>
                 </div><!--widgetcontent-->         
             </div>
         </div>   
         <div class="one_half last">
             <div class="widgetbox" >
-                <div class="title"><h2 class="tabbed"><span>Display Script</span></h2></div>
-                <div class="widgetcontent padding0">                
-                    <iframe name="displayOutput" id="displayOutput" style="min-height: 485px;border: 1px #000 dashed; overflow-y: scroll; width: 100%;" ></iframe>
+                <div class="title"><h2 class="tabbed"><span>Display Script</span></h2></div>                
+                <div class="widgetcontent padding0" id="displayOutputs">                
+                    <iframe name="displayOutput" id="displayOutput" style="min-height: 268px;border: 1px #000 dashed; overflow-y: scroll; width: 100%;" ></iframe>
                 </div><!--widgetcontent-->         
             </div>
         </div> 
 
 </div>  
 <br clear="all">
-
 
 @endsection
