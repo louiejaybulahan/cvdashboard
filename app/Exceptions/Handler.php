@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -74,6 +75,14 @@ class Handler extends ExceptionHandler
         //if ($exception instanceof NotFoundHttpException) {
         //  return redirect()->guest('error');             
         //}
+
+        if ($exception instanceof MethodNotAllowedHttpException) {
+            // return redirect()->route('site.index');
+            //dd('made it here');
+            return response()->json( [                
+                'message' => 'Method is not allowed for the requested route',
+            ], 405 );
+        }
         return parent::render($request, $exception);
     }
 

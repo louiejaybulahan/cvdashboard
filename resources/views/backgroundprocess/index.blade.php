@@ -18,6 +18,7 @@ var jsCheckScheduled = null;
 var jsScriptCommand = 0;
 jQuery(window).ready(function () {      
     jQuery('.btnBack').click(function () {
+        jQuery('#id').val(0);
         jQuery('#divNew').hide();        
         jQuery('#divList').fadeIn();
     });   
@@ -66,6 +67,18 @@ jQuery(window).ready(function () {
     jsGetScheduled();
 });  
 function jsMessage(message) { jQuery.jGrowl(message); return false; }
+function jsEdit(id){
+    $.getJSON("{{ route('backgroundprocess.edit',['id' => '']) }}"+id, function( data ) { 
+        jQuery('#id').val(data.info.id);
+        jQuery('#scriptname').val(data.info.scriptname);
+        jQuery('#url').val(data.info.url);
+        jQuery('#parameters').val(data.info.parameters);
+        jQuery('#run_in').val(data.info.run_in);
+        jQuery('#time').val(data.info.time); 
+        jQuery('#btnNew').trigger('click');
+    });  
+    return false;
+}
 function jsDelete(id){
     var dataString = {'_token':'{{ csrf_token() }}', 'id':id};
     jQuery.ajax({
@@ -102,16 +115,16 @@ function changeStatus(tmpClass){
         }    
     });      
 }
-// function startChecking() {
-//     jsCheckScheduled = setInterval(function () {        
-//         jsCheckSchduled();
-//     }, 3000);
-// }
-// function stopChecking(){
-//     clearInterval(jsCheckScheduled);
-//     return false;
-// }
+function startChecking() {
+    jsCheckScheduled = setInterval(function () { jsGetScheduled(); }, 3000);
+    return false;
+}
+function stopChecking(){
+    clearInterval(jsCheckScheduled);
+    return false;
+}
 function jsGetScheduled(){
+    clearInterval(jsCheckScheduled);
     if(jsScriptCommand==0){
         var index = eval(jQuery('#rowIndex').val());
         var url = "{{ route('backgroundprocess.checkscript',['row'=> '']) }}";
@@ -122,13 +135,15 @@ function jsGetScheduled(){
                     htmHistory += '* '+key + ' : ' + val+'<br>';
                 });            
             }      
+            if(data.isEmpty==1){ startChecking(); }
+
             jsLoadScriptFound(data.url);
             jQuery('#htmScriptname').html(data.scriptname);
             jQuery('#htmUrl').html(data.url);
             jQuery('#htmParameters').html(data.parameters);        
             jQuery('#htmRunin').html(data.run_in);        
             jQuery('#htmHistory').html(htmHistory);
-            jQuery('#rowIndex').val(data.rowIndex);   
+            jQuery('#rowIndex').val(data.rowIndex);              
         });
     }
     return false;
@@ -140,7 +155,8 @@ function jsQueryProcessDone(){
     return false;
 }
 function jsLoadScriptFound(jsUrl){
-    jQuery('#displayOutput').attr('src',jsUrl);    
+    // jQuery('#displayOutput').attr('src',jsUrl);  
+    // jsQueryProcessDone();  
     /*
     jQuery('#displayOutput').html(' Loading ... ');        
     var ifr=$('<iframe/>', {
@@ -181,7 +197,7 @@ function jsLoadScriptFound(jsUrl){
                 <col class="con1" width="150">
                 <col class="con0" width="150">
                 <col class="con1" width="50">
-                <col class="con0" width="100">
+                <col class="con0" width="150">
             </colgroup>
             <thead>
                 <tr>
@@ -217,7 +233,12 @@ function jsLoadScriptFound(jsUrl){
                         <td>{{ $r->run_in }} </td>
                         <td>{{ $r->time }} </td>
                         <td id="td_{{$r->id}}"><a href="#status-{{$r->id}}-{{$r->status}}" onclick="changeStatus('{{$r->id}}-{{$r->status}}');">{{ $r->status==0 ? 'Active':'Block' }}</a> </td>
-                        <td><center><a href="#Delete-{{ $r->id }}" class="stdbtn"  style="opacity: 1;" onclick="jsDelete('{{ $r->id }}');">Delete</a></center></td>
+                        <td>
+                            <center>
+                                <a href="#Edit-{{ $r->id }}" class="stdbtn"  style="opacity: 1;" onclick="jsEdit('{{ $r->id }}');">Edit</a>
+                                <a href="#Delete-{{ $r->id }}" class="stdbtn"  style="opacity: 1;" onclick="jsDelete('{{ $r->id }}');">Delete</a>
+                            </center>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
@@ -228,6 +249,7 @@ function jsLoadScriptFound(jsUrl){
             <h2 class="form"><span>Add New Script</span></h2>
         </div>	   
         {{ Form::open(['route' => 'backgroundprocess.addscript','class' => 'stdform stdform2','id' => 'frmSubmitForm','novalidate' => 'novalidate','onsubmit' => 'return false;']) }}        
+            <input type="hidden" id="id" name="id" value="0">
             <p>
                 <label>Script Name</label>
                 <span class="field"><input type="text" name="scriptname" id="scriptname" class="longinput"></span>
@@ -252,7 +274,7 @@ function jsLoadScriptFound(jsUrl){
                         <!-- option value="6">Every Weeks</option -->
                     </select>
                 </span>                
-            </p>            
+            </p>                                       
             <p>
                 <label>Time to run</label>
                 <span class="field">

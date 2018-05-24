@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 //use Illuminate\Routing\UrlGenerator;
 //use Illuminate\Routing\Redirector;
 //use Illuminate\Support\Facades\Auth;
+use App\Helpers\AppTools;
 use Illuminate\Support\Facades\DB;
 use App\CashGrant;
 use App\Models\TblTurnOut;
+use App\Models\Config;
 
 
 class ListTurnoutController extends Controller {
@@ -31,7 +33,6 @@ class ListTurnoutController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {      
-        // echo route('listturnout.show', ['post' => 1]);               
         $currentYear = date('Y');                
         $period = [];           
         $category = [];
@@ -140,8 +141,7 @@ class ListTurnoutController extends Controller {
         sort($_client_status);
         sort($_sex);
         sort($_grade_group);
-        sort($_ip);
-        
+        sort($_ip);        
         $_region = \App\Models\LibRegions::all();           
         return view('listturnout.index',[            
             '_period' => $_period,
@@ -170,7 +170,8 @@ class ListTurnoutController extends Controller {
             '_sex' => $_sex, 
             '_grade_group' => $_grade_group,
             '_ip' => $_ip, 
-        ]);         
+        ]);     
+                
     }
     public function filter(Request $request){          
         $registration = $finalremarks = $program = $set = $bank = $periodcover = $modepayment = ['-'];        
@@ -218,7 +219,7 @@ class ListTurnoutController extends Controller {
             'registration' => $registration,
         ]);                  
     }       
-    public function search(Request $request){
+    public function search(Request $request){        
         $counter = 1;
         $list = [];            
         $data = [];
@@ -260,17 +261,20 @@ class ListTurnoutController extends Controller {
             'client_status' => $request->client_status,
             'sex' => $request->sex,
             'grade_group' => $request->grade_group,
-            'ip' => $request->ip,
+            'ip' => $request->ip,            
+        ];     
+
+        $filterColumn =  AppTools::implodeAssociate('',$model->search);        
+
+        $model->search = array_merge($model->search,[
             'page' => $request->page,            
             'order' => $request->order,
             'sort' => $request->sort,
             'limit' => $request->limit,
             'select' => '',
             'count' => false,
-        ];            
-        // echo $model->getQuery();
-        $data = $model->getData();        
-        $request->session()->put('listnoncomplianfds', $model->search);        
+        ]);         
+        $data = $model->getData();
         if(!empty($data)){            
             //$result = collect($data)->map(function($x){ return (array) $x; })->toArray(); 
             foreach($data AS $r){
@@ -309,15 +313,16 @@ class ListTurnoutController extends Controller {
                 $counter++;
             }
         }    
-        $total = 0;
-        $foundSession = false;
-        $cntlr = $request->session()->get('controller.listnoncompliantfds',null); 
-        if($request->page==1){
-            $foundSession = true;
-            $model->search['count'] = true;                        
-            $cntlr = $model->getData();                               
-            $request->session()->put('controller.listnoncompliantfds',$cntlr);            
-        }    
+        $total = 0;        
+        $storedCountRow = Config::isHandlerExist('LIST_TURNOUT_'.$filterColumn);            
+        if($storedCountRow){                
+            $cntlr = json_decode($storedCountRow);
+        }else{
+            $model->search['count'] = true;
+            $cntlr = $model->getData(); 
+            Config::setValue('LIST_TURNOUT_'.$filterColumn,json_encode($cntlr));
+        }
+
         if(!empty($cntlr)):
             foreach($cntlr AS $r):
                 $total += $r->total;
@@ -328,7 +333,7 @@ class ListTurnoutController extends Controller {
             'rows' => number_format($total),
             'pages' => ceil(intval($total) / $request->limit),
             'pageActive' => intval($request->page),
-        ]);        
+        ]);            
     }      
     public function showSummary(Request $request){
         $search = $request->session()->get('cashgrantQuery');

@@ -71,7 +71,7 @@ class TblTurnOut extends Model
                 }else{                 
                     if(is_array($this->search['select'])){
                         $select = implode('\',\'',$this->search['select']);
-                    }else{ $select = 'COUNT(*) AS total'; }
+                    }else{  $select = 'COUNT(*) AS total';  }
                 }
                 $leftJoin = ' LEFT JOIN lib_brgy ON lib_brgy.BRGY_ID='.$this->table.$y.'_'.$p.'.brgy_id
                             LEFT JOIN lib_cities ON lib_cities.CITY_ID=lib_brgy.CITY_ID 

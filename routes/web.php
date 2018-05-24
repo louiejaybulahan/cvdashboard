@@ -34,12 +34,8 @@ Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
     Route::get('/','UsersController@index')->name('index');    
     Route::get('register','UsersController@register')->name('register');    
     Route::post('save','UsersController@save')->name('save');    
-    //Route::post('list','UsersController@list')->name('list');    
     Route::post('edit','UsersController@edit')->name('edit');        
-    //Route::post('permission','UsersController@permission')->name('permission');
-    //Route::post('municipal','UsersController@municipal')->name('municipal');
     Route::post('remove','UsersController@remove')->name('remove');    
-    //Route::post('savepermission','UsersController@savepermission')->name('savepermission');
 });
 
 Route::group(['prefix' => 'listeducation', 'as' => 'listeducation.'], function () {
@@ -104,13 +100,13 @@ Route::group(['prefix' => 'backgroundprocess', 'as' => 'backgroundprocess.'], fu
     Route::get('/','BackgroundprocessController@index')->name('index');          
     Route::get('checkscript','BackgroundprocessController@checkscript')->name('checkscript');      
     Route::post('addscript','BackgroundprocessController@addscript')->name('addscript');  
+    Route::get('edit','BackgroundprocessController@edit')->name('edit');      
     Route::post('remove','BackgroundprocessController@remove')->name('remove');      
     Route::post('status','BackgroundprocessController@status')->name('status');      
 });
 
 
 Route::get('profile','SiteController@index')->name('profile');
-
 Route::get('error',function(){ return view('error'); });
 
 

@@ -636,5 +636,15 @@ class AppTools
             }
         }
         return $array;
+    }        
+    public static function implodeAssociate($delimiter,$array){
+        // return implode($delimiter,self::array_map_assoc(function($k,$v){return "$k ($v)";},$array));
+        $output = array_map(function($k){
+            if(isset($k) AND $k!='null' AND $k!=null){
+                if(is_array($k)){ return implode('.',$k); }
+                else{ return $k; }
+            }else return '';            
+        },$array);
+        return implode('',$output);        
     }
 }
