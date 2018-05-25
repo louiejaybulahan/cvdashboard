@@ -552,10 +552,10 @@ function jsShowSummary(){
          <label><strong>Actions :</strong></label>
         <select id="actions" name="actions"> 
             <option value="summary">Summary Report</option>               
-            <option value="xlsx">Export Excel</option>
+            <!-- option value="xlsx">Export Excel</option>
             <option value="pdfConvert">Convert to PDF</option>
             <option value="print">Print Report</option>            
-            <option value="pdfReport">PDF Report</option>            
+            <option value="pdfReport">PDF Report</option -->
         </select>
         <a href="#actions" id="btnActions" class="stdbtn btn_blue"><span>Go</span></a>   
     </div>
