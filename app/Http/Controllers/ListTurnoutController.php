@@ -367,7 +367,7 @@ class ListTurnoutController extends Controller {
         $year = 2017;
         $period = 1;
         $table = 'tbl_turnout_'.$year.'_'.$period;
-        $config = \App\Config::getValue(['PERIOD_START','PERIOD_CURRENT']);        
+        $config = Config::getValue(['PERIOD_START','PERIOD_CURRENT']);        
         $year = $config['PERIOD_CURRENT'];        
                  
         $column = 'category';

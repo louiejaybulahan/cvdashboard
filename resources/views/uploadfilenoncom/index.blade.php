@@ -8,7 +8,7 @@
 @section('optLayout','noright')
 
 @section('cssExtention')
-<link rel="stylesheet" href="js/modal/jquery.modal.min.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="{{ asset('js/modal/jquery.modal.min.css') }}" type="text/css" media="screen" />
 @endsection
 
 @section('jsExtention')

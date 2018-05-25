@@ -1,32 +1,19 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Auth;
 use Schema;
 use Illuminate\Http\Request;
-//use Illuminate\Routing\UrlGenerator;
-//use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use App\Models\Tbl_turnout;
 use Config,Eloquent;
 use Excel;
 class SiteController extends Controller {
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct() {
         // $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index() {      
 
 		$category = DB::table('tbl_turnout')->select(DB::raw('category'))->groupBy('category')->get();	
@@ -43,25 +30,44 @@ class SiteController extends Controller {
 		$year = $request->input('year');
 		$period = $request->input('period');
 		$regions = $request->input('regions');
-		//print_r($regions);
-		//$regions= implode("','",$request->input('regions'));
-		$cvturnout = null;
+		$category = $request->input('category');
+		$hhset = $request->input('hhset');
+		$ccsedata['dataprovider1'] = null;
+		$ccsedata['dataprovider2'] = null;
+		//$cvturnout = null;
+		//$dashdata = [];
 		$filtered_category = array("Family Development Sessions","Deworming");
 		$month = DB::table('lib_periods')->select('months')->where([['year','=',trim($year)],['period','=',trim($period)]])->first();
 		$monthnum = explode("-", $month->months);
-		//var_dump(date("F", strtotime(date("Y")."-".$monthnum[0]."-01")));
 		$monthName1 = date("F", mktime(0, 0, 0, $monthnum[0], 10));
 		$monthName2 = date("F", mktime(0, 0, 0, $monthnum[1], 10));
-		if($request->input('report') == 1){
-				
-					$dashdata = $this->turnoutquery($regions,$request->input('category'),$request->input('hhset'),$year,$period);
-																				
-		} else{
-			
+		$report_type = $request->input('report');
+		
+		//if($report_type == 1){			        
+			//	$dashdata = $this->turnoutquery($regions,$category,$hhset,$year,$period);									
+			//} 
+		
+		if($report_type == 2){			
+				$dashdata = $this->turnoutquery($regions,$category,$hhset,$year,$period);	
+			    $dashdata1 = $this->ccse_query($regions,$category,$hhset,$year,$period);	
+				foreach($dashdata1 as $q){					
+		$ccsedata['dataprovider1'].= '{"region" : "' .  $q->region . '","compliant_vs_submitted":' . intval($q->compliant_vs_submitted1) . ',"compliant_calamity_vs_eligible": ' .  intval($q->compliant_calamity_vs_eligible1) . '},';
+		$ccsedata['dataprovider2'].= '{"region" : "' .  $q->region . '","compliant_vs_submitted":' . intval($q->compliant_vs_submitted2) . ',"compliant_calamity_vs_eligible": ' .  intval($q->compliant_calamity_vs_eligible2) . '},';
+					//$ccsedata['dataprovider1'][] = ["region" => $q->region,'compliant_vs_submitted' => intval($q->compliant_vs_submitted1),'compliant_calamity_vs_eligible' =>  intval($q->compliant_calamity_vs_eligible1)];	
+					//$ccsedata['dataprovider2'][] = ['region' => $q->region,'compliant_vs_submitted' => intval($q->compliant_vs_submitted2),'compliant_calamity_vs_eligible' =>  intval($q->compliant_calamity_vs_eligible2)];	
+				}	
 		}
-		return response()->json(['cvturnout' =>  $dashdata->toArray(), '_token' => csrf_token(), 'month1' => $monthName1, 'month2' => $monthName2]);		
+		
+		$ccsedata['dataprovider1'] = '[' . rtrim($ccsedata['dataprovider1'], ',') . ']';
+		$ccsedata['dataprovider2'] = '[' . rtrim($ccsedata['dataprovider2'], ',') . ']';
+		//echo "<pre>";
+		//print_r($ccsedata);
+		//echo "</pre>";
+	//	$ccsedata['dataprovider1'] = array_map('stripslashesFull',$ccsedata['dataprovider1']);
+		
+		
+		return response()->json(['cvturnout' =>  $dashdata->toArray(),'ccsedata' => $ccsedata, '_token' => csrf_token(), 'month1' => $monthName1, 'month2' => $monthName2, 'report_type' => $report_type]);		
 	}
-	
 	
 	
 	public function exportexcel(Request $request){
@@ -69,13 +75,9 @@ class SiteController extends Controller {
 		$period = $request->period;
 		$category = $request->category;
 		$hhset = $request->hhset;
-		$regions[] = explode(',',$request->regions);
-		//$q = $regions[0];
-		//$r = "'".implode("','",[$regions])."'";
-		//print_r($r);
+		$regions[] = explode(',',$request->regions);	
 		$cvturnout_columns = [];
 		$filtered_category = array("Family Development Sessions","Deworming");
-		
 			if(in_array($category,$filtered_category)){
 				if($category == trim('Deworming')){
 					$cvturnout_columns[] = ['Region','Eligible for CVS Education Monitoring','Not Attending School','Attending School',
@@ -85,9 +87,9 @@ class SiteController extends Controller {
 											'Compliant (monitored, with cash grant)','Compliant vs Submitted(Conducted Deworming)'];
 											
 						$turnoutquery= $this->turnoutquery_deworming($category,$hhset,$year,$period);
-						foreach($turnoutquery->toArray() as $r){			
-							$cvturnout_columns[] = $r;
-						}
+										foreach($turnoutquery->toArray() as $r){			
+												$cvturnout_columns[] = $r;
+										}
 					$cvturnout_columns = json_decode( json_encode($cvturnout_columns), true);					
 				}
 				if($category == trim('Family Development Sessions')){
@@ -95,16 +97,13 @@ class SiteController extends Controller {
 				}
 			}else{
 					$cvturnout_columns[] =  Schema::getColumnListing('tbl_turnout');//[1,2,3,4,5]			
-					$turnoutquery= $this->turnoutquery($regions[0],$category,$hhset,$year,$period);
-						foreach($turnoutquery->toArray() as $r){			
-							$cvturnout_columns[] = $r;
-						}
+						$turnoutquery= $this->turnoutquery($regions[0],$category,$hhset,$year,$period);
+										foreach($turnoutquery->toArray() as $r){			
+												$cvturnout_columns[] = $r;
+										}
 					$cvturnout_columns = json_decode( json_encode($cvturnout_columns), true);
 			}
 			
-		//echo "<pre>";
-		//print_r($cvturnout_columns);
-		//echo "</pre>";
 		Excel::create('CV_turnout', function($excel) use ($cvturnout_columns) {		 
 						$excel->setTitle('CV_turnout');
 						$excel->setCreator('WSC')->setCompany('DSWD_CVD');
@@ -112,11 +111,10 @@ class SiteController extends Controller {
 						$excel->sheet('sheet1', function($sheet) use ($cvturnout_columns) {
 										$sheet->fromArray($cvturnout_columns, null, 'A1', false, false);
 								});
-				})->download('xlsx'); 	
+		})->download('xlsx'); 	
 	}
 	
-	public function turnoutquery($regions,$category,$hhset,$year,$period){
-		
+	public function turnoutquery($regions,$category,$hhset,$year,$period){	
 		$whereclause = [['category','=',trim($category)],['set','=',trim($hhset)],['year','=',trim($year)],['period','=',trim($period)]];
 		 if($regions <> 'null'){
 		 $tquery = DB::table('tbl_turnout')->where($whereclause)->whereIn('region',$regions)->get();
@@ -132,4 +130,56 @@ class SiteController extends Controller {
 										->where($whereclause)->get();
 	}
 	
+
+		
+	public function ccse_query($regions,$category,$hhset,$year,$period){
+			
+		$whereclause = [['category','=',trim($category)],['set','=',trim($hhset)],['year','=',trim($year)],['period','=',trim($period)]];
+		 if($regions <> 'null'){
+		 $tquery = DB::table('tbl_turnout')->select(DB::raw('region,compliant_vs_submitted1,compliant_calamity_vs_eligible1,compliant_vs_submitted2,compliant_calamity_vs_eligible2'))->where($whereclause)->whereIn('region',$regions)->get();
+		 } else{
+			 $tquery = DB::table('tbl_turnout')->select(DB::raw('region,compliant_vs_submitted1,compliant_calamity_vs_eligible1,compliant_vs_submitted2,compliant_calamity_vs_eligible2'))->where($whereclause)->get(); 
+		 }
+		return $tquery;
+	}	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

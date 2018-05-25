@@ -5,36 +5,24 @@
 
 @section('cssExtention')
 <!-- link rel="stylesheet" href="js/datatables/datatables.min.css" type="text/css" media="screen" / -->
-<link rel="stylesheet" href="{{ asset('js/amcharts_weezam/export.css') }}" type="text/css" media="all" />
-<link rel="stylesheet" href="{{ asset('js/amcharts_weezam/bodycharts.css') }}" type="text/css" media="all" />
-<link rel="stylesheet" href="{{ asset('js/chosen/chosen.css') }}" type="text/css" media="screen" />
+<link rel="stylesheet" href="js/amcharts_weezam/export.css" type="text/css" media="all" />
+<link rel="stylesheet" href="js/amcharts_weezam/bodycharts.css" type="text/css" media="all" />
+<link rel="stylesheet" href="js/chosen/chosen.css" type="text/css" media="screen" />
 @endsection
 
 @section('jsExtention')
 
 <script type="text/javascript" src="{{ asset('js/plugins/jquery.jgrowl.js') }}"></script>
-<!--AMCHARTS includes-->
 <script type="text/javascript" src="{{ asset('js/amcharts_weezam/amcharts.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/amcharts_weezam/serial.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/amcharts_weezam/export.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/amcharts_weezam/light.js') }}"></script>
-<!--AMCHARTS ends-->
-
-<!--HighCharts includes-->
-<script type="text/javascript" src="{{ asset('js/highchart_weezam/highcharts.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/highchart_weezam/modules/exporting.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/highchart_weezam/modules/export-data.js') }}"></script>
-<!--HighCharts end-->
-
-<!--<script type="text/javascript" src="{{ asset('js/amcharts_weezam/amcharts_sample.js') }}"></script>-->
+<script type="text/javascript" src="{{ asset('js/amcharts_weezam/amcharts_sample.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/chosen/chosen.jquery.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/chosen/init.js') }}"></script>
 <script type="text/javascript">
  jQuery('#loading').hide();
 	jQuery(document).ready(function () {
-		jQuery('#contentid_graph1').hide();
-		jQuery('#contentid_graph2').hide();
-		jQuery('#contentid_header_graph').hide();
 		jQuery('#contentid').hide();
 	    jQuery('#exportbtn').hide();
 		jQuery('.chosen').chosen({ width: "65%",height: "35%"});
@@ -56,7 +44,6 @@
 				
 	function jsloaddashboarddata(){		 
 		var category =  jQuery('#category').val();
-		var report =  jQuery('#report').val();
 		var hhset = jQuery('#hhset').val();
 		var year = jQuery('#year').val();
 		var period = jQuery('#period').val();
@@ -69,199 +56,12 @@
 				jQuery.ajax({
 							type: "POST", url:'{{ route('site.dashboarddata') }}', data: param, dataType: 'json', cache: false,        
 							error: function (request, status, error) { jsMessage('Error Request'); },
-							success: function (data) { 
-							    
-								if(report == 2){	
-								
-								
-								
-								Highcharts.chart('container', {
-  chart: {
-    type: 'line'
-  },
-  title: {
-    text: 'Monthly Average Temperature'
-  },
-  subtitle: {
-    text: 'Source: WorldClimate.com'
-  },
-  xAxis: {
-    categories: ['NCR', 'CAR', 'I', 'II', 'III', 'IV-A', 'IV-B', 'V', 'VI', 'VII', 'CARAGA', 'ARMM']
-  },
-  yAxis: {
-    title: {
-      text: 'Temperature (°C)'
-    }
-  },
-  plotOptions: {
-    line: {
-      dataLabels: {
-        enabled: true
-      },
-      enableMouseTracking: false
-    }
-  },
-  series: [{
-    name: 'Period 1',
-    data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-  }, {
-    name: 'Period 2',
-    data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
-  }]
-});
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-							    if (data.ccsedata.dataprovider1.includes('\"')) { var provider = JSON.parse(data.ccsedata.dataprovider1); }
-								if (data.ccsedata.dataprovider2.includes('\"')) { var provider2 = JSON.parse(data.ccsedata.dataprovider2); }
-									//jQuery('#contentid').hide();
-	                               // jQuery('#exportbtn').hide();
-									jQuery('#contentid_graph1').show();
-									jQuery('#contentid_graph2').show();
-									jQuery('#contentid_header_graph').show();
-									var vardata = jQuery('#hhset :selected').text();
-									jQuery("#content_header_result_graph").text( ((vardata != 0) ? vardata : 'ALL SETS' ) +' '+ jQuery('#report :selected').text() + ' For ' + jQuery('#category :selected').text() + ' in the Year ' + jQuery('#year :selected').text()+ ' Period ' + jQuery('#period :selected').text() );
-									jQuery("#header_result_graph").text(' Month of ' + data.month1);
-									jQuery("#header_result_graph2").text(' Month of ' + data.month2);
-									var chart = AmCharts.makeChart("chartdiv", {
-													"type": "serial",
-													 "theme": "light",
-													"categoryField": "region",
-													"rotate": true,
-													"startDuration": 1,
-													"categoryAxis": {
-														"gridPosition": "start",
-														"position": "left"
-													},
-													"trendLines": [],
-													"graphs": [
-														{
-															"balloonText": "compliant_vs_submitted:[[value]]",
-															"fillAlphas": 0.8,
-															"id": "AmGraph-1",
-															"lineAlpha": 0.2,
-															"title": "compliant_vs_submitted",
-															"type": "column",
-															"valueField": "compliant_vs_submitted"
-														},
-														{
-															"balloonText": "compliant_calamity_vs_eligible:[[value]]",
-															"fillAlphas": 0.8,
-															"id": "AmGraph-2",
-															"lineAlpha": 0.2,
-															"title": "compliant_calamity_vs_eligible",
-															"type": "column",
-															"valueField": "compliant_calamity_vs_eligible"
-														}
-													],
-													"guides": [],
-													"valueAxes": [
-														{
-															"id": "ValueAxis-1",
-															"position": "top",
-															"axisAlpha": 0
-														}
-													],
-													"allLabels": [],
-													"balloon": {},
-													"titles": [],
-													"dataProvider": provider /*[{"region" : "Caraga",
-																	   "compliant_vs_submitted" : 26,
-																		 "compliant_calamity_vs_eligible" : 49	}]*/,
-													"export": {
-														"enabled": true
-													 }
-
-												});
-												
-												
-												var chart1 = AmCharts.makeChart("chartdiv2", {
-													"type": "serial",
-													 "theme": "light",
-													"categoryField": "region",
-													"rotate": true,
-													"startDuration": 1,
-													"categoryAxis": {
-														"gridPosition": "start",
-														"position": "left"
-													},
-													"trendLines": [],
-													"graphs": [
-														{
-															"balloonText": "compliant_vs_submitted:[[value]]",
-															"fillAlphas": 0.8,
-															"id": "AmGraph-1",
-															"lineAlpha": 0.2,
-															"title": "compliant_vs_submitted",
-															"type": "column",
-															"valueField": "compliant_vs_submitted"
-														},
-														{
-															"balloonText": "compliant_calamity_vs_eligible:[[value]]",
-															"fillAlphas": 0.8,
-															"id": "AmGraph-2",
-															"lineAlpha": 0.2,
-															"title": "compliant_calamity_vs_eligible",
-															"type": "column",
-															"valueField": "compliant_calamity_vs_eligible"
-														}
-													],
-													"guides": [],
-													"valueAxes": [
-														{
-															"id": "ValueAxis-1",
-															"position": "top",
-															"axisAlpha": 0
-														}
-													],
-													"allLabels": [],
-													"balloon": {},
-													"titles": [],
-													"dataProvider": provider2 ,
-													"export": {
-														"enabled": true
-													 }
-
-												}); 
-												
-												
-								}
-								
-								
-								//if(report == 1){
-								//	jQuery('#contentid_graph1').hide();
-									//jQuery('#contentid_graph2').hide();
-								//	jQuery('#contentid_header_graph').hide();
-								jQuery('#contentid').show();
-								jQuery('#exportbtn').show();
-								var vardata = jQuery('#hhset :selected').text();	
-								jQuery("#header_result").text( ((vardata != 0) ? vardata : 'ALL SETS' ) + ' CV turn-out  For ' + jQuery('#category :selected').text() + ' in the Year ' + jQuery('#year :selected').text()+ ' Period ' + jQuery('#period :selected').text());
-								
-								if(category == jQuery.trim("Deworming")){
+							success: function (data) {   
+							jQuery('#contentid').show();
+							var vardata = jQuery('#hhset :selected').text();	
+						   jQuery("#header_result").text( ((vardata != 0) ? vardata : 'ALL SETS' ) +' '+ jQuery('#report :selected').text() + ' FOR ' + jQuery('#category :selected').text() + ' IN THE YEAR ' + jQuery('#year :selected').text()+ ' PERIOD ' + jQuery('#period :selected').text());
+						   
+						   if(category == jQuery.trim("Deworming")){
 							    jQuery("#dashresult").html('<table cellpadding="0" cellspacing="0" border="0" class="stdtable" id="cvturnout_table">' 
 														  +'<thead>'															
 															+'<tr>'
@@ -295,11 +95,11 @@
 																		+'<td>'+ val.enrolled_within_municipality.toLocaleString()+ '</td>'
 																		+'<td>'+ val.not_submitted.toLocaleString()+ '</td>'
 																		+'<td>'+ val.state_of_calamity.toLocaleString()+ '</td>'
-																		+'<td>'+ val.submitted.toLocaleString()+ '</td>'
-																		+'<td>'+ val.submitted_deworming.toLocaleString()+ '</td>'
-																		+'<td>'+ val.non_compliant1.toLocaleString()+ '</td>'
-																		+'<td>'+ val.compliant_w_cash_grant1.toLocaleString()+ '</td>'
-																		+'<td>'+ val.compliant_vs_submitted2.toLocaleString()+ '%</td>'		
+																		+'<td>'+ val.compliant_w_cash_grant2.toLocaleString()+ '</td>'
+																		+'<td>'+ val.compliant_vs_submitted2.toLocaleString()+ '%</td>'
+																		+'<td>'+ val.compliant_calamity_vs_eligible2.toLocaleString()+ '%</td>'
+																		+'<td>'+ val.ave_comp_rate_comp_vs_submitted.toLocaleString()+ '%</td>'
+																		+'<td>'+ val.ave_comp_rate_comp_calamity_vs_eligible.toLocaleString()+ '%</td>'		
 																  +'</tr>');		
 																								   })
 						   }else{
@@ -389,15 +189,13 @@
 								})
 					
 						  }						
-								
-					//}				
-								}
+							}
 								}).done(function(){ 							
 										jQuery('#loading').fadeOut();
-										
+										 jQuery('#exportbtn').show();
 								});   
 								return false;					
-}
+					}
 
 </script>
 
@@ -413,7 +211,7 @@
                     	<p>
                         	<label>Regions</label>	
 							<span class="field">
-									<select name="regions" id="regions" class="chosen" multiple="multiple" data-placeholder="Select some Regions">									
+									<select name="regions" id="regions" class="chosen" multiple="multiple">									
 									@foreach($regions AS $r)
 									<option value="{{ $r->region }}">{{ $r->region }}</option>
 									@endforeach	
@@ -426,7 +224,7 @@
                         	<label>Turn-out Reports</label>	
 							<span class="field">
 									<select name="report" id="report" >									
-									
+									<option value="1">CV Turn-out</option>
 									<option value="2">Compliant Comparison vs Submitted vs Eligible </option>
 									<option value="3">Eligible for CVS Monitoring</option>
 									<option value="4">Attending and Not Attending in School beneficiaries </option>
@@ -437,18 +235,11 @@
                         <p>
                         	<label> Category  & Sets</label>	
 							<span class="field">
-									<select name="category" id="category" > <!--class="chosen" multiple="multiple" data-placeholder="Select some Turn-out Category"-->
+									<select name="category" id="category" >
 									@foreach($category AS $r)
 									<option value="{{ $r->category }}">{{ $r->category }}</option>
 									@endforeach
-                            </select><!--<small class="desc" style="margin:0px;">(*) selecting multiple category will append in dashboard section as to the number of category selected</small> <br>-->
-							
-							</span>	
-                          </p>  
-						   <p>
-                        	<label> Household Sets</label>	
-							<span class="field">
-									
+                            </select> <br><br>
 							<select name="selection" id="hhset">
 									<option value="0">All sets</option>
 									<option value="1">Set 1</option>
@@ -502,43 +293,11 @@
 						<h2 class="table"><span id ="header_result"></span></th></h2>
 					</div><!--contenttitle-->	
 					<div id="dashresult"></div>	<br>
-					<div id="dashexport"><a href="#" id="exportbtn" class="btn btn2 btn_book" style="background-color: rgb(247, 247, 247);"><span>Export Result to Excel(.xlsx)</span></a></div><br>					             
+					<div id="dashexport"><a href="#" id="exportbtn" class="btn btn2 btn_book" style="background-color: rgb(247, 247, 247);"><span>Export Result to Excel(.xlsx)</span></a></div>					             
                  </div>
-				 
-		<!--Graph divs-->		 
-				 <div class="notification msginfo" id="contentid_header_graph">
-                        <a class="close"></a>
-                      <p> <span id ="content_header_result_graph"></span></p>
-                    </div>
-				 
-				
-				 
-				 <div id="contentid_graph1" class="one_half">
-					<div class="contenttitle radiusbottom0" >
-						<h2 class="table"><span id ="header_result_graph"></span></h2>
-					</div><!--contenttitle-->	
-					<div id="chartdiv"></div>	
-				
-                 </div>
-				 <div id="contentid_graph2" class="one_half last">
-					<div class="contenttitle radiusbottom0" >
-						<h2 class="table"><span id ="header_result_graph2"></span></h2>
-					</div><!--contenttitle-->	
-					<div id="chartdiv2"></div>	
-				
-                 </div>
-				   <br clear="all">
-				   
-				   <div id="contentid_container">
-					<div class="contenttitle radiusbottom0" >
-						<h2 class="table"><span id ="header_result_container">tstdfsdfsdf</span></th></h2>
-					</div><!--contenttitle-->	
-					<div id="container"></div>	<br>
-					
-                 </div>
-				 
+				 <br clear="all">    
 	</div>
-	
+<br clear="all">	
 @endsection
 
 @section('right')
